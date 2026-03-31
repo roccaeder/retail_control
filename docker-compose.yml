@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    # Este comando instala gemas, repara los binarios y arranca el server
+    command: >
+      bash -c "bundle install && 
+               bundle exec rails app:update:bin && 
+               bundle exec rails server -b 0.0.0.0"
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/retail_control_development
+      RAILS_ENV: development
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  bundle_cache:
