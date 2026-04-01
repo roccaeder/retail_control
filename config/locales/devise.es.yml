@@ -1,0 +1,54 @@
+es:
+  devise:
+    confirmations:
+      confirmed: "Tu cuenta ha sido confirmada exitosamente."
+      send_instructions: "Recibirás un correo con instrucciones para confirmar tu cuenta en unos minutos."
+      send_paranoid_instructions: "Si tu correo existe en nuestra base de datos, recibirás instrucciones para confirmarlo."
+    failure:
+      already_authenticated: "Ya tienes una sesión activa."
+      inactive: "Tu cuenta aún no está activada."
+      invalid: "Correo o contraseña incorrectos."
+      locked: "Tu cuenta está bloqueada."
+      last_attempt: "Te queda un intento antes de que tu cuenta sea bloqueada."
+      not_found_in_database: "Correo o contraseña incorrectos."
+      timeout: "Tu sesión expiró. Por favor inicia sesión nuevamente."
+      unauthenticated: "Debes iniciar sesión para continuar."
+      unconfirmed: "Debes confirmar tu correo antes de continuar."
+    mailer:
+      confirmation_instructions:
+        subject: "Instrucciones de confirmación"
+      reset_password_instructions:
+        subject: "Instrucciones para restablecer contraseña"
+      unlock_instructions:
+        subject: "Instrucciones para desbloquear cuenta"
+      email_changed:
+        subject: "Correo actualizado"
+      password_change:
+        subject: "Contraseña actualizada"
+    omniauth_callbacks:
+      failure: "No se pudo autenticar desde %{kind} porque \"%{reason}\"."
+      success: "Autenticado exitosamente desde %{kind}."
+    passwords:
+      no_token: "No puedes acceder a esta página sin un enlace de restablecimiento de contraseña."
+      send_instructions: "Recibirás un correo con instrucciones para restablecer tu contraseña en unos minutos."
+      send_paranoid_instructions: "Si tu correo existe, recibirás un enlace de recuperación en unos minutos."
+      updated: "Tu contraseña fue cambiada exitosamente. Ya tienes sesión iniciada."
+      updated_not_active: "Tu contraseña fue cambiada exitosamente."
+    registrations:
+      destroyed: "Tu cuenta ha sido cancelada exitosamente."
+      signed_up: "Bienvenido. Tu cuenta fue creada exitosamente."
+      updated: "Tu cuenta fue actualizada exitosamente."
+    sessions:
+      signed_in: "Sesión iniciada exitosamente."
+      signed_out: "Sesión cerrada exitosamente."
+      already_signed_out: "Sesión cerrada exitosamente."
+    unlocks:
+      unlocked: "Tu cuenta fue desbloqueada. Por favor inicia sesión."
+  errors:
+    messages:
+      already_confirmed: "ya fue confirmado, intenta iniciar sesión"
+      not_found: "no encontrado"
+      not_locked: "no estaba bloqueado"
+      not_saved:
+        one: "1 error impidió guardar este %{resource}:"
+        other: "%{count} errores impidieron guardar este %{resource}:"
