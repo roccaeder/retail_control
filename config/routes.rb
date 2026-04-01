@@ -7,7 +7,9 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   resources :customers
-  resources :products
+  resources :products do
+    get "search", on: :collection
+  end
   resources :sales
 
   # Rutas de salud del sistema (Rails 8)

@@ -31,18 +31,18 @@ end
 puts "✅ Usuarios Eder y Sebastian creados (Password: password123)"
 
 puts "👥 Creando Clientes y Fiados..."
-nombres_clientes = ["Juan Perez", "Maria Garcia", "Tienda La Bendicion", "Comercial Martinez", "Dona Rosa", "Pedro Picapiedra"]
+nombres_clientes = [ "Juan Perez", "Maria Garcia", "Tienda La Bendicion", "Comercial Martinez", "Dona Rosa", "Pedro Picapiedra" ]
 15.times do |i|
   Customer.create!(
     name: nombres_clientes.sample + " #{i}",
     phone: "9#{rand(10000000..99999999)}",
-    debt_limit: [500, 1000, 5000].sample,
+    debt_limit: [ 500, 1000, 5000 ].sample,
     current_debt: 0
   )
 end
 
 puts "📦 Creando Inventario de Productos..."
-productos_base = ["Harina Pan", "Coca Cola 1.5L", "Arroz 1kg", "Aceite Vegetal", "Detergente", "Papel Higienico", "Cerveza Pack", "Cigarrillos"]
+productos_base = [ "Harina Pan", "Coca Cola 1.5L", "Arroz 1kg", "Aceite Vegetal", "Detergente", "Papel Higienico", "Cerveza Pack", "Cigarrillos" ]
 25.times do |i|
   costo = rand(5.0..40.0).round(2)
   Product.create!(
@@ -65,7 +65,7 @@ products = Product.all
     customer: customer,
     status: rand(0..1), # 0: paid, 1: pending
     payment_method: rand(0..2), # 0: cash, 1: credit, 2: transfer
-    discount_amount: [0, 0, 0, 5, 10].sample # Mayor probabilidad de 0 descuento
+    discount_amount: [ 0, 0, 0, 5, 10 ].sample # Mayor probabilidad de 0 descuento
   )
 
   subtotal_acumulado = 0
@@ -74,7 +74,7 @@ products = Product.all
     product = products.sample
     cantidad = rand(1..3)
     subtotal_acumulado += (product.sale_price * cantidad)
-    
+
     sale.sale_items << SaleItem.new(
       product: product,
       quantity: cantidad,

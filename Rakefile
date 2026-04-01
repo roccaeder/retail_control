@@ -10,9 +10,8 @@ Rails.application.load_tasks
 # 2 - Task `avo:sym_link`
 # 3 - Cmd  `yarn avo:tailwindcss`
 # 4 - Task `assets:precompile`
-Rake::Task["assets:precompile"].enhance(["avo:sym_link"])
-Rake::Task["avo:sym_link"].enhance(["avo:yarn_install"])
+Rake::Task["assets:precompile"].enhance([ "avo:sym_link" ])
+Rake::Task["avo:sym_link"].enhance([ "avo:yarn_install" ])
 Rake::Task["avo:sym_link"].enhance do
   `yarn avo:tailwindcss`
 end
-
