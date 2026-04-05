@@ -56,6 +56,7 @@ docker compose exec app bundle exec rails db:prepare
 | Acción | Comando |
 | :--- | :--- |
 | **Levantar la App** | `docker compose up` |
+| **Levantar la App Render Tailwind** | `docker compose exec app bundle exec rails tailwindcss:watch` |
 | **Detener la App** | `docker compose down` |
 | **Entrar a la Consola de Rails** | `docker compose exec app bundle exec rails c` |
 | **Correr Migraciones** | `docker compose exec app bundle exec rails db:migrate` |

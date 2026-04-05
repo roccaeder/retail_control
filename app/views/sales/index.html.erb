@@ -16,6 +16,11 @@
     <% end %>
   </div>
 
+  <div data-controller="hello">
+    <input type="text" data-hello-target="name">
+    <button data-action="click->hello#greet">Saludar</button>
+  </div>
+
   <%# ── KPI mini-cards ─────────────────────────────────────── %>
   <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
     <div class="bg-white rounded-2xl border border-stone-100 p-4 shadow-sm">
