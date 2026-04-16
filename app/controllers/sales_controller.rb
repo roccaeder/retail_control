@@ -1,47 +1,84 @@
 class SalesController < ApplicationController
-  before_action :authenticate_user!
   layout "erp"
 
+  before_action :set_sale, only: [ :show ]
+
   def index
-    @sales = Sale.includes(:customer).order(created_at: :desc)
+    @sales = Sale.includes(:customer, :payments).order(created_at: :desc)
+  end
+
+  def show
+    @payments = @sale.payments.order(:date)
   end
 
   def new
-    @customers = Customer.order(:name)
-    @products = Product.where("stock > 0").order(:name)
+    @sale = Sale.new
+    load_form_data
   end
 
   def create
     @sale = Sale.new(sale_params)
 
-    subtotal = @sale.sale_items.sum { |item| item.quantity.to_i * item.unit_price.to_f }
-    discount = @sale.discount_amount.to_f
-    @sale.subtotal = subtotal
-    @sale.total    = [ subtotal - discount, 0 ].max
+    calculate_totals
+    @sale.account = current_tenant
 
     if @sale.sale_items.empty?
       flash.now[:alert] = "Agrega al menos un producto para registrar la venta."
-      @customers = Customer.order(:name)
-      @products  = Product.where("stock > 0").order(:name)
+      load_form_data
       render :new, status: :unprocessable_entity
       return
     end
 
-    if @sale.save
-      redirect_to sales_path, notice: "Venta ##{@sale.id} registrada correctamente."
-    else
-      @customers = Customer.order(:name)
-      @products  = Product.where("stock > 0").order(:name)
-      render :new, status: :unprocessable_entity
+    ActiveRecord::Base.transaction do
+      @sale.save!
+      register_initial_payment if initial_payment_amount.positive?
     end
+
+    redirect_to sales_path, notice: "Venta #{@sale.code} registrada correctamente."
+  rescue ActiveRecord::RecordInvalid => e
+    flash.now[:alert] = e.message
+    load_form_data
+    render :new, status: :unprocessable_entity
   end
 
   private
 
+  def set_sale
+    # acts_as_tenant garantiza que solo se encuentra dentro del tenant actual.
+    @sale = Sale.find(params[:id])
+  end
+
   def sale_params
     params.require(:sale).permit(
-      :customer_id, :status, :payment_method, :discount_amount,
+      :customer_id, :payment_method, :on_credit, :discount_amount,
       sale_items_attributes: [ :product_id, :quantity, :unit_price, :discount ]
     )
+  end
+
+  def calculate_totals
+    subtotal = @sale.sale_items.sum { |item| item.quantity.to_i * item.unit_price.to_f }
+    discount = @sale.discount_amount.to_f
+    @sale.subtotal = subtotal
+    @sale.total    = [ subtotal - discount, 0 ].max
+  end
+
+  def register_initial_payment
+    result = Payments::RegisterPaymentService.call(
+      sale:           @sale,
+      amount:         initial_payment_amount,
+      payment_method: @sale.payment_method,
+      date:           Date.current
+    )
+
+    raise ActiveRecord::RecordInvalid.new(@sale) unless result.success
+  end
+
+  def initial_payment_amount
+    params[:initial_payment_amount].to_d
+  end
+
+  def load_form_data
+    @customers = Customer.order(:name)
+    @products  = Product.where("stock > 0").order(:name)
   end
 end

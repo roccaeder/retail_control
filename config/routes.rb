@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   get "dashboard/index"
   mount Avo::Engine, at: Avo.configuration.root_path
 
-  devise_for :users
+  devise_for :users, controllers: { registrations: "users/registrations" }
 
   root "dashboard#index"
 
