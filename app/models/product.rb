@@ -1,2 +1,11 @@
 class Product < ApplicationRecord
+  acts_as_tenant(:account)
+
+  has_many :sale_items, dependent: :restrict_with_error
+
+  validates :name, presence: true
+  validates :sale_price, numericality: { greater_than_or_equal_to: 0 }
+  validates :cost_price, numericality: { greater_than_or_equal_to: 0 }
+  validates :stock, numericality: { greater_than_or_equal_to: 0 }
+  validates :sku, uniqueness: { scope: :account_id }, allow_blank: true
 end

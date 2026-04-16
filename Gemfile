@@ -15,6 +15,7 @@ gem "lucide-rails"         # Iconos
 # --- ERP & Auth ---
 gem "devise"
 gem "avo"
+gem "acts_as_tenant"
 
 # --- Backend & Performance ---
 gem "jbuilder"
