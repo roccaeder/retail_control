@@ -1,0 +1,13 @@
+full_payment:
+  sale: paid_cash
+  account: one
+  amount: 3.36
+  payment_method: 0  # cash
+  date: 2026-04-17
+
+partial_payment:
+  sale: on_credit_partial
+  account: one
+  amount: 4.00
+  payment_method: 0  # cash
+  date: 2026-04-17

@@ -1,0 +1,24 @@
+coca_cola:
+  name: "Coca Cola 1.5L"
+  sku: "ADE-001"
+  cost_price: 1.20
+  sale_price: 1.68
+  stock: 50
+  account: one
+
+arroz:
+  name: "Arroz 1kg"
+  sku: "ADE-002"
+  cost_price: 1.80
+  sale_price: 2.25
+  stock: 30
+  account: one
+
+# Producto en cuenta dos
+harina:
+  name: "Harina Pan 1kg"
+  sku: "TIS-001"
+  cost_price: 2.50
+  sale_price: 3.25
+  stock: 20
+  account: two

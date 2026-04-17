@@ -1,0 +1,7 @@
+one:
+  name: "Almacén Don Eder"
+  subdomain: "almacen-don-eder"
+
+two:
+  name: "Tienda Sebastián"
+  subdomain: "tienda-sebastian"

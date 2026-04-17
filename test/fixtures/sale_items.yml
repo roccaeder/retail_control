@@ -1,0 +1,23 @@
+item_one:
+  sale: paid_cash
+  product: coca_cola
+  account: one
+  quantity: 2
+  unit_price: 1.68
+  discount: 0.00
+
+item_two:
+  sale: on_credit_pending
+  product: arroz
+  account: one
+  quantity: 2
+  unit_price: 2.25
+  discount: 0.00
+
+item_three:
+  sale: on_credit_partial
+  product: coca_cola
+  account: one
+  quantity: 4
+  unit_price: 1.68
+  discount: 0.00

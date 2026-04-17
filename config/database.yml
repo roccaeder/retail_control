@@ -17,7 +17,7 @@ default: &default
   encoding: unicode
   host: db
   username: postgres
-  password: password
+  password: <%= ENV.fetch("DB_PASSWORD") { "password" } %>
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
