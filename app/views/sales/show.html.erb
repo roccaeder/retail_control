@@ -1,0 +1,18 @@
+<h1>Venta <%= @sale.code %></h1>
+
+<p>Cliente: <%= @sale.customer.name %></p>
+<p>Total: $<%= @sale.total %></p>
+<p>Saldo pendiente: $<%= @sale.balance_due %></p>
+<p>Estado: <%= @sale.status %></p>
+
+<h2>Ítems</h2>
+<% @sale.sale_items.each do |item| %>
+  <div><%= item.product.name %> × <%= item.quantity %> — $<%= item.unit_price %></div>
+<% end %>
+
+<h2>Pagos</h2>
+<% @payments.each do |payment| %>
+  <div><%= payment.date %> — $<%= payment.amount %> (<%= payment.payment_method %>)</div>
+<% end %>
+
+<%= link_to "Volver", sales_path %>
