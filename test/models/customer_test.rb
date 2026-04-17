@@ -34,7 +34,7 @@ class CustomerTest < ActiveSupport::TestCase
 
   test "solo devuelve clientes del tenant actual" do
     ids_del_tenant = Customer.all.map(&:account_id).uniq
-    assert_equal [default_account.id], ids_del_tenant
+    assert_equal [ default_account.id ], ids_del_tenant
   end
 
   test "no ve clientes de otras cuentas" do

@@ -52,7 +52,7 @@ class SaleTest < ActiveSupport::TestCase
 
   test "Sale.all no incluye ventas de otro tenant" do
     all_account_ids = Sale.all.map(&:account_id).uniq
-    assert_equal [default_account.id], all_account_ids
+    assert_equal [ default_account.id ], all_account_ids
   end
 
   # ── auto_set_status ────────────────────────────────────────────────────────

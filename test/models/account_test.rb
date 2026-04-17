@@ -25,7 +25,7 @@ class AccountTest < ActiveSupport::TestCase
   end
 
   test "subdominio rechaza caracteres inválidos" do
-    ["Mi Tienda", "MAYUSCULAS", "tiene_guion_bajo", "punto.com"].each do |sub|
+    [ "Mi Tienda", "MAYUSCULAS", "tiene_guion_bajo", "punto.com" ].each do |sub|
       account = Account.new(name: "X", subdomain: sub)
       assert_not account.valid?, "Se esperaba inválido para subdomain='#{sub}'"
     end

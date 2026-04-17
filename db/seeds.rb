@@ -4,7 +4,7 @@
 require "bcrypt"
 
 puts "Limpiando datos existentes..."
-[Payment, SaleItem, Sale, Customer, Product, User, Account].each(&:delete_all)
+[ Payment, SaleItem, Sale, Customer, Product, User, Account ].each(&:delete_all)
 
 NOMBRES_CLIENTES = [
   "Ana Martínez", "Luis García", "Tienda La Bendición", "Comercial Rodríguez",
@@ -19,7 +19,7 @@ PRODUCTOS_BASE = [
   { name: "Aceite Vegetal 1L",    costo: 3.00,  margen: 0.28 },
   { name: "Detergente 500ml",     costo: 1.50,  margen: 0.35 },
   { name: "Papel Higiénico x4",   costo: 2.00,  margen: 0.30 },
-  { name: "Cerveza 355ml Pack x6",costo: 6.00,  margen: 0.20 },
+  { name: "Cerveza 355ml Pack x6", costo: 6.00,  margen: 0.20 },
   { name: "Jabón de Lavar 250g",  costo: 0.80,  margen: 0.45 },
   { name: "Azúcar 1kg",           costo: 1.10,  margen: 0.25 },
   { name: "Leche Entera 1L",      costo: 1.30,  margen: 0.22 },
@@ -50,7 +50,7 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
       Customer.create!(
         name:         NOMBRES_CLIENTES[i % NOMBRES_CLIENTES.size] + (i >= NOMBRES_CLIENTES.size ? " #{i}" : ""),
         phone:        "9#{rand(10_000_000..99_999_999)}",
-        debt_limit:   [300, 500, 1000, 2000, 5000].sample,
+        debt_limit:   [ 300, 500, 1000, 2000, 5000 ].sample,
         current_debt: 0,
         account:      account
       )
@@ -74,9 +74,9 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
     # Ventas históricas con lógica de deuda real
     ventas_count.times do |i|
       customer = clientes.sample
-      on_credit = [true, false, false].sample   # ~33% fiado
-      payment_method = on_credit ? :credit : [:cash, :transfer].sample
-      discount = [0, 0, 0, 5, 10, 20].sample
+      on_credit = [ true, false, false ].sample   # ~33% fiado
+      payment_method = on_credit ? :credit : [ :cash, :transfer ].sample
+      discount = [ 0, 0, 0, 5, 10, 20 ].sample
 
       sale = Sale.new(
         customer:        customer,
@@ -101,7 +101,7 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
       end
 
       sale.subtotal = subtotal.round(2)
-      sale.total    = [subtotal - discount, 0].max.round(2)
+      sale.total    = [ subtotal - discount, 0 ].max.round(2)
       sale.save!
 
       if on_credit

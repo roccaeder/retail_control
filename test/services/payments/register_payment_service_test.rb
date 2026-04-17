@@ -66,7 +66,7 @@ class Payments::RegisterPaymentServiceTest < ActiveSupport::TestCase
       sale: @sale, amount: 2.00, payment_method: :cash, date: Date.today
     )
 
-    expected_debt = @customer.sales.where(status: [:pending, :partial]).sum { |s| s.balance_due }
+    expected_debt = @customer.sales.where(status: [ :pending, :partial ]).sum { |s| s.balance_due }
     assert_in_delta expected_debt, @customer.reload.current_debt, 0.01
   end
 
