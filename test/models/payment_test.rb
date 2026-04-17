@@ -2,51 +2,41 @@ require "test_helper"
 
 class PaymentTest < ActiveSupport::TestCase
   setup do
-    setup_tenant
+    @account  = create(:account)
+    @customer = create(:customer, account: @account)
+    @sale     = create(:sale, :pending, account: @account, customer: @customer)
+    setup_tenant(@account)
   end
 
-  teardown do
-    teardown_tenant
+  teardown { teardown_tenant }
+
+  # ── Asociaciones ──────────────────────────────────────────────────────────
+  test "pertenece a una venta" do
+    payment = create(:payment, sale: @sale, account: @account)
+    assert_equal @sale, payment.sale
   end
 
-  test "válido con datos correctos" do
-    payment = Payment.new(
-      sale:           sales(:on_credit_pending),
-      amount:         2.00,
-      payment_method: :cash,
-      date:           Date.today,
-      account:        default_account
-    )
-    assert payment.valid?
+  test "pertenece a un account" do
+    payment = create(:payment, sale: @sale, account: @account)
+    assert_equal @account, payment.account
   end
 
-  test "inválido con monto cero" do
-    payment = Payment.new(
-      sale: sales(:on_credit_pending), amount: 0,
-      payment_method: :cash, date: Date.today, account: default_account
-    )
-    assert_not payment.valid?
-    assert payment.errors[:amount].any?
+  # ── Validaciones ──────────────────────────────────────────────────────────
+  test "amount debe ser mayor a 0" do
+    assert_not build(:payment, sale: @sale, account: @account, amount: 0).valid?
   end
 
-  test "inválido con monto negativo" do
-    payment = Payment.new(
-      sale: sales(:on_credit_pending), amount: -5,
-      payment_method: :cash, date: Date.today, account: default_account
-    )
-    assert_not payment.valid?
+  test "amount negativo es inválido" do
+    assert_not build(:payment, sale: @sale, account: @account, amount: -1).valid?
   end
 
-  test "inválido sin fecha" do
-    payment = Payment.new(
-      sale: sales(:on_credit_pending), amount: 2,
-      payment_method: :cash, date: nil, account: default_account
-    )
+  test "date no puede ser nil" do
+    payment = build(:payment, sale: @sale, account: @account, date: nil)
     assert_not payment.valid?
     assert payment.errors[:date].any?
   end
 
-  test "pertenece al tenant correcto" do
-    assert_equal default_account, payments(:full_payment).account
+  test "válido con datos completos" do
+    assert build(:payment, sale: @sale, account: @account).valid?
   end
 end

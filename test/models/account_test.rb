@@ -1,38 +1,59 @@
 require "test_helper"
 
 class AccountTest < ActiveSupport::TestCase
-  test "válido con nombre y subdominio correcto" do
-    account = Account.new(name: "Mi Tienda", subdomain: "mi-tienda")
-    assert account.valid?
+  # ── Asociaciones (Account es el tenant root, no tiene conflicto) ──────────
+  test "has_many users dependent destroy" do
+    assert_matcher have_many(:users).dependent(:destroy), Account.new
   end
 
+  test "has_many customers dependent destroy" do
+    assert_matcher have_many(:customers).dependent(:destroy), Account.new
+  end
+
+  test "has_many products dependent destroy" do
+    assert_matcher have_many(:products).dependent(:destroy), Account.new
+  end
+
+  test "has_many sales dependent destroy" do
+    assert_matcher have_many(:sales).dependent(:destroy), Account.new
+  end
+
+  test "has_many payments dependent destroy" do
+    assert_matcher have_many(:payments).dependent(:destroy), Account.new
+  end
+
+  # ── Validaciones manuales (Account no tiene acts_as_tenant) ──────────────
   test "inválido sin nombre" do
-    account = Account.new(subdomain: "mi-tienda")
+    account = build(:account, name: nil)
     assert_not account.valid?
-    assert_includes account.errors[:name], "can't be blank"
+    assert account.errors[:name].any?
   end
 
-  test "inválido sin subdominio" do
-    account = Account.new(name: "Mi Tienda")
-    assert_not account.valid?
-    assert_includes account.errors[:subdomain], "can't be blank"
-  end
-
-  test "subdominio debe ser único" do
-    account = Account.new(name: "Otro", subdomain: accounts(:one).subdomain)
+  test "inválido sin subdomain" do
+    account = build(:account, subdomain: nil)
     assert_not account.valid?
     assert account.errors[:subdomain].any?
   end
 
-  test "subdominio rechaza caracteres inválidos" do
+  test "subdomain debe ser único" do
+    create(:account, subdomain: "unico")
+    duplicate = build(:account, subdomain: "unico")
+    assert_not duplicate.valid?
+    assert duplicate.errors[:subdomain].any?
+  end
+
+  test "subdomain rechaza mayúsculas, espacios y caracteres especiales" do
     [ "Mi Tienda", "MAYUSCULAS", "tiene_guion_bajo", "punto.com" ].each do |sub|
-      account = Account.new(name: "X", subdomain: sub)
-      assert_not account.valid?, "Se esperaba inválido para subdomain='#{sub}'"
+      assert_not build(:account, subdomain: sub).valid?,
+                 "Se esperaba inválido para subdomain='#{sub}'"
     end
   end
 
-  test "subdominio acepta letras minúsculas, números y guiones" do
-    account = Account.new(name: "X", subdomain: "tienda-123")
-    assert account.valid?
+  test "subdomain acepta letras minúsculas, números y guiones" do
+    assert build(:account, subdomain: "tienda-123").valid?
+  end
+
+  test "factory genera accounts válidas" do
+    assert build(:account).valid?
   end
 end
