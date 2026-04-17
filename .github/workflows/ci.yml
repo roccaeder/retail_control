@@ -75,6 +75,9 @@ jobs:
       - name: Cargar schema en base de datos de test
         run: bin/rails db:schema:load
 
+      - name: Build Tailwind CSS
+        run: bin/rails tailwindcss:build
+
       - name: Correr tests con coverage
         run: bin/rails test
 
