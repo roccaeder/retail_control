@@ -2,106 +2,88 @@ require "test_helper"
 
 class Payments::RegisterPaymentServiceTest < ActiveSupport::TestCase
   setup do
-    setup_tenant
-    @sale    = sales(:on_credit_pending)   # total: 4.50, sin pagos
-    @customer = customers(:luis)
+    @account  = create(:account)
+    @customer = create(:customer, account: @account)
+    @sale     = create(:sale, :pending, account: @account, customer: @customer, total: 4.50)
+    setup_tenant(@account)
   end
 
-  teardown do
-    teardown_tenant
-  end
+  teardown { teardown_tenant }
 
   # ── Pago completo ──────────────────────────────────────────────────────────
-
-  test "pago completo pone la venta en estado paid" do
-    result = Payments::RegisterPaymentService.call(
-      sale: @sale, amount: @sale.total, payment_method: :cash, date: Date.today
-    )
-
+  test "pago completo marca la venta como paid" do
+    result = call(amount: @sale.total)
     assert result.success
     assert @sale.reload.paid?
   end
 
   test "pago completo deja balance_due en 0" do
-    Payments::RegisterPaymentService.call(
-      sale: @sale, amount: @sale.total, payment_method: :cash, date: Date.today
-    )
-
+    call(amount: @sale.total)
     assert_equal 0.0, @sale.reload.balance_due.to_f
   end
 
   # ── Pago parcial ───────────────────────────────────────────────────────────
-
-  test "pago parcial pone la venta en estado partial" do
-    result = Payments::RegisterPaymentService.call(
-      sale: @sale, amount: 2.00, payment_method: :cash, date: Date.today
-    )
-
+  test "pago parcial marca la venta como partial" do
+    result = call(amount: 2.00)
     assert result.success
     assert @sale.reload.partial?
   end
 
   test "pago parcial reduce balance_due correctamente" do
-    Payments::RegisterPaymentService.call(
-      sale: @sale, amount: 2.00, payment_method: :cash, date: Date.today
-    )
-
+    call(amount: 2.00)
     assert_in_delta 2.50, @sale.reload.balance_due, 0.01
   end
 
   # ── Deuda del cliente ──────────────────────────────────────────────────────
-
-  test "pago completo elimina la deuda del cliente" do
-    deuda_previa = @customer.current_debt.to_f
-
-    Payments::RegisterPaymentService.call(
-      sale: @sale, amount: @sale.total, payment_method: :cash, date: Date.today
-    )
-
-    assert @customer.reload.current_debt < deuda_previa || @customer.reload.current_debt == 0
+  test "pago completo reduce la deuda del cliente a 0" do
+    @customer.update!(current_debt: @sale.total)
+    call(amount: @sale.total)
+    assert_equal 0.0, @customer.reload.current_debt.to_f
   end
 
-  test "pago parcial actualiza la deuda del cliente al saldo pendiente" do
-    Payments::RegisterPaymentService.call(
-      sale: @sale, amount: 2.00, payment_method: :cash, date: Date.today
-    )
-
-    expected_debt = @customer.sales.where(status: [ :pending, :partial ]).sum { |s| s.balance_due }
-    assert_in_delta expected_debt, @customer.reload.current_debt, 0.01
+  test "pago parcial actualiza la deuda al saldo pendiente real" do
+    call(amount: 2.00)
+    expected = @customer.sales.where(status: [ :pending, :partial ]).sum { |s| s.balance_due }
+    assert_in_delta expected, @customer.reload.current_debt, 0.01
   end
 
   # ── Validaciones ───────────────────────────────────────────────────────────
-
-  test "retorna fallo si el monto es 0" do
-    result = Payments::RegisterPaymentService.call(
-      sale: @sale, amount: 0, payment_method: :cash, date: Date.today
-    )
-
-    assert_not result.success
-    assert result.errors.any?
+  test "monto 0 retorna fallo sin crear pago" do
+    assert_no_difference "Payment.count" do
+      result = call(amount: 0)
+      assert_not result.success
+      assert result.errors.any?
+    end
   end
 
-  test "retorna fallo sin payment_method" do
-    result = Payments::RegisterPaymentService.call(
-      sale: @sale, amount: 2.0, payment_method: nil, date: Date.today
-    )
-
+  test "payment_method nil retorna fallo" do
+    result = call(amount: 2.00, payment_method: nil)
     assert_not result.success
   end
 
   # ── Múltiples pagos acumulativos ───────────────────────────────────────────
+  test "varios pagos parciales saldan la venta al llegar al total" do
+    sale = create(:sale, :partial, account: @account, customer: @customer, total: 10.00)
+    create(:payment, sale: sale, account: @account, amount: 4.00)
 
-  test "múltiples pagos parciales acumulan hasta saldar la venta" do
-    sale = sales(:on_credit_partial)   # total: 10.00, tiene 1 pago de 4.00
+    call(sale: sale, amount: 3.00)
+    call(sale: sale, amount: 3.00)
 
-    Payments::RegisterPaymentService.call(
-      sale: sale, amount: 3.00, payment_method: :cash, date: Date.today
-    )
-    Payments::RegisterPaymentService.call(
-      sale: sale, amount: 3.00, payment_method: :cash, date: Date.today
-    )
-
-    assert sale.reload.paid?, "Se esperaba estado :paid después de pagar el total"
+    assert sale.reload.paid?
     assert_equal 0.0, sale.balance_due.to_f
+  end
+
+  # ── WebMock: sin llamadas HTTP externas ───────────────────────────────────
+  test "el service no hace llamadas HTTP externas" do
+    # WebMock lanzará error si hubiera algún request no stubbeado
+    assert_nothing_raised { call(amount: @sale.total) }
+  end
+
+  private
+
+  def call(sale: @sale, amount:, payment_method: :cash, date: Date.today)
+    Payments::RegisterPaymentService.call(
+      sale: sale, amount: amount, payment_method: payment_method, date: date
+    )
   end
 end
