@@ -1,0 +1,8 @@
+<% @products.each do |product| %>
+  <div data-product-id="<%= product.id %>"
+       data-product-name="<%= product.name %>"
+       data-product-price="<%= product.sale_price %>"
+       data-product-stock="<%= product.stock %>">
+    <%= product.name %> — $<%= product.sale_price %>
+  </div>
+<% end %>

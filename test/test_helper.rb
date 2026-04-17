@@ -1,3 +1,22 @@
+# SimpleCov debe cargarse ANTES que Rails para instrumentar todo el código.
+require "simplecov"
+SimpleCov.start "rails" do
+  enable_coverage :branch
+
+  add_filter "/test/"
+  add_filter "/config/"
+  add_filter "/db/"
+  add_filter "/vendor/"
+
+  add_group "Models",      "app/models"
+  add_group "Controllers", "app/controllers"
+  add_group "Services",    "app/services"
+
+  # Umbral actual. Subir gradualmente al agregar más tests.
+  # Meta: 80% líneas / 70% ramas.
+  minimum_coverage line: 75, branch: 60
+end
+
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"

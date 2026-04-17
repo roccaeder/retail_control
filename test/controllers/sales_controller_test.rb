@@ -97,6 +97,20 @@ class SalesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # ── show ───────────────────────────────────────────────────────────────────
+
+  test "GET show responde 200" do
+    get sale_path(sales(:paid_cash))
+    assert_response :success
+  end
+
+  test "GET show de otra cuenta lanza RecordNotFound" do
+    otra_venta_id = ActsAsTenant.without_tenant { Sale.where(account: accounts(:two)).first&.id }
+    skip "No hay ventas en cuenta dos" unless otra_venta_id
+
+    assert_raises(ActiveRecord::RecordNotFound) { get sale_path(otra_venta_id) }
+  end
+
   # ── Aislamiento de tenant ──────────────────────────────────────────────────
 
   test "no puede ver ventas de otra cuenta" do

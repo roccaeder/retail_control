@@ -46,3 +46,5 @@ docker-compose.override.yml
 .idea/
 *.swp
 *.orig
+# SimpleCov
+/coverage/

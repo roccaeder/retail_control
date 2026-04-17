@@ -6,47 +6,105 @@ on:
     branches: [ main ]
 
 jobs:
+  # ── 1. Seguridad estática ────────────────────────────────────────────────
   scan_ruby:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-
-      - name: Scan for common Rails security vulnerabilities using static analysis
+      - name: Brakeman (vulnerabilidades Rails)
         run: bin/brakeman --no-pager
-      
-      - name: Scan for known security vulnerabilities in gems used
+      - name: Bundler Audit (gems con CVEs)
         run: bin/bundler-audit
-      
+
+  # ── 2. Linting ──────────────────────────────────────────────────────────
   lint:
     runs-on: ubuntu-latest
     env:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-
-      - name: Prepare RuboCop cache
+      - name: Preparar caché RuboCop
         uses: actions/cache@v5
         env:
           DEPENDENCIES_HASH: ${{ hashFiles('.ruby-version', '**/.rubocop.yml', '**/.rubocop_todo.yml', 'Gemfile.lock') }}
         with:
           path: ${{ env.RUBOCOP_CACHE_ROOT }}
           key: rubocop-${{ runner.os }}-${{ env.DEPENDENCIES_HASH }}-${{ github.ref_name == github.event.repository.default_branch && github.run_id || 'default' }}
-          restore-keys: |
-            rubocop-${{ runner.os }}-${{ env.DEPENDENCIES_HASH }}-
-
-      - name: Lint code for consistent style
+          restore-keys: rubocop-${{ runner.os }}-${{ env.DEPENDENCIES_HASH }}-
+      - name: RuboCop
         run: bin/rubocop -f github
 
+  # ── 3. Tests + Coverage ─────────────────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: app_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      # Sobreescribe host: db del database.yml para apuntar al service de CI
+      DATABASE_URL: postgres://postgres:password@localhost:5432/app_test
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Cargar schema en base de datos de test
+        run: bin/rails db:schema:load
+
+      - name: Correr tests con coverage
+        run: bin/rails test
+
+      - name: Verificar umbral de coverage (≥ 57% líneas)
+        run: |
+          if [ ! -f coverage/.last_run.json ]; then
+            echo "❌ No se encontró coverage/.last_run.json — ¿corrió SimpleCov?"
+            exit 1
+          fi
+
+          LINE_COV=$(python3 -c "import json; d=json.load(open('coverage/.last_run.json')); print(d['result']['line'])")
+          echo "Coverage de líneas: ${LINE_COV}%"
+
+          LINE_INT=$(python3 -c "print(int(float('${LINE_COV}')))")
+
+          # Umbral sincronizado con minimum_coverage en test/test_helper.rb.
+          # Subir junto con ese valor al agregar más tests.
+          THRESHOLD=75
+          if [ "$LINE_INT" -lt "$THRESHOLD" ]; then
+            echo "❌ Coverage insuficiente: ${LINE_COV}% < ${THRESHOLD}%"
+            echo "   Agregá tests antes de mergear."
+            exit 1
+          fi
+
+          echo "✅ Coverage OK: ${LINE_COV}%"
+
+      - name: Subir reporte HTML de coverage como artefacto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
