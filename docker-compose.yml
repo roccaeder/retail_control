@@ -8,7 +8,6 @@ services:
 
   app:
     build: .
-    # Este comando instala gemas, repara los binarios y arranca el server
     command: >
       bash -c "bundle install && 
                bundle exec rails app:update:bin && 
@@ -19,7 +18,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/retail_control_development
+      DB_PASSWORD: password 
       RAILS_ENV: development
     depends_on:
       - db

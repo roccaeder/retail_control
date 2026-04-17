@@ -1,0 +1,10 @@
+# encrypted_password = BCrypt::Password.create("password123")
+eder:
+  email: "eder@example.com"
+  encrypted_password: "$2a$12$jzMBNbkBPCKfb4AUACkD0.UEMJ6yIAVHqJnkAiChJADx6CeEJBZMm"
+  account: one
+
+sebastian:
+  email: "sebastian@example.com"
+  encrypted_password: "$2a$12$jzMBNbkBPCKfb4AUACkD0.UEMJ6yIAVHqJnkAiChJADx6CeEJBZMm"
+  account: two

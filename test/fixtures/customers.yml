@@ -1,0 +1,21 @@
+ana:
+  name: "Ana Martínez"
+  phone: "91234567"
+  debt_limit: 1000.00
+  current_debt: 0.00
+  account: one
+
+luis:
+  name: "Luis García"
+  phone: "98765432"
+  debt_limit: 500.00
+  current_debt: 200.00
+  account: one
+
+# Cliente en la cuenta dos (para tests de aislamiento)
+rosa:
+  name: "Doña Rosa"
+  phone: "99991111"
+  debt_limit: 2000.00
+  current_debt: 0.00
+  account: two

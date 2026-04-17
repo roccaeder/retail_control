@@ -1,0 +1,32 @@
+paid_cash:
+  customer: ana
+  account: one
+  code: "VTA-0001"
+  status: 0          # paid
+  payment_method: 0  # cash
+  on_credit: false
+  subtotal: 3.36
+  discount_amount: 0.00
+  total: 3.36
+
+on_credit_pending:
+  customer: luis
+  account: one
+  code: "VTA-0002"
+  status: 1          # pending
+  payment_method: 1  # credit
+  on_credit: true
+  subtotal: 4.50
+  discount_amount: 0.00
+  total: 4.50
+
+on_credit_partial:
+  customer: luis
+  account: one
+  code: "VTA-0003"
+  status: 2          # partial
+  payment_method: 1  # credit
+  on_credit: true
+  subtotal: 10.00
+  discount_amount: 0.00
+  total: 10.00
