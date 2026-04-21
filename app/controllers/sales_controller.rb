@@ -22,13 +22,6 @@ class SalesController < ApplicationController
     calculate_totals
     @sale.account = current_tenant
 
-    if @sale.sale_items.empty?
-      @sale.errors.add(:base, "Agrega al menos un producto para registrar la venta.")
-      load_form_data
-      render :new, status: :unprocessable_entity
-      return
-    end
-
     ActiveRecord::Base.transaction do
       @sale.save!
       register_initial_payment
@@ -49,7 +42,7 @@ class SalesController < ApplicationController
 
   def sale_params
     params.require(:sale).permit(
-      :customer_id, :payment_method, :on_credit, :discount_amount,
+      :customer_id, :payment_method, :on_credit, :discount_amount, :amount_received,
       sale_items_attributes: [ :product_id, :quantity, :unit_price, :discount ]
     )
   end
@@ -62,9 +55,11 @@ class SalesController < ApplicationController
   end
 
   def register_initial_payment
+    amount = @sale.on_credit? ? @sale.amount_received.to_f : @sale.total
+
     result = Payments::RegisterPaymentService.call(
       sale:           @sale,
-      amount:         @sale.total,
+      amount:         amount,
       payment_method: @sale.payment_method,
       date:           Date.current
     )

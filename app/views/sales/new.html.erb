@@ -104,11 +104,14 @@
           </div>
 
           <div>
-            <label class="text-xs font-semibold text-stone-400 uppercase tracking-wider block mb-1">Monto Recibido</label>
-            <input type="number" step="any" value="0" readonly
-                  data-sale-items-target="totalInput"
-                  data-action="input->sale-items#calculateDebt"
-                  class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-sm transition-all">
+            <%= f.label :amount_received, "Monto Recibido",
+                class: "text-xs font-semibold text-stone-400 uppercase tracking-wider block mb-1" %>
+            <%= f.number_field :amount_received, step: :any, value: 0, readonly: true,
+                data: {
+                  sale_items_target: "totalInput",
+                  action: "input->sale-items#calculateDebt"
+                },
+                class: "w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-sm transition-all" %>
           </div>
 
           <div>
