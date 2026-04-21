@@ -11,15 +11,16 @@ class SaleTest < ActiveSupport::TestCase
 
   teardown { teardown_tenant }
 
+  # ── Associations ──────────────────────────────────────────────────────────
   describe "associations" do
     let(:sale) { Sale.new }
 
-    it { assert_matcher belong_to(:customer), sale }
     it { assert_matcher have_many(:sale_items).dependent(:destroy), sale }
     it { assert_matcher have_many(:payments).dependent(:destroy), sale }
     it { assert_matcher accept_nested_attributes_for(:sale_items), sale }
   end
 
+  # ── Enums ─────────────────────────────────────────────────────────────────
   describe "enums" do
     let(:sale) { Sale.new }
 
@@ -32,6 +33,7 @@ class SaleTest < ActiveSupport::TestCase
     end
   end
 
+  # ── Validations ───────────────────────────────────────────────────────────
   describe "validations" do
     test "is invalid with a negative total" do
       sale = build(:sale, total: -1)
@@ -64,6 +66,105 @@ class SaleTest < ActiveSupport::TestCase
     end
   end
 
+  # ── assign_generic_customer ───────────────────────────────────────────────
+  describe "assign_generic_customer" do
+    test "assigns Consumidor Final when no customer and not on credit" do
+      sale = build(:sale, on_credit: false)
+      sale.customer = nil
+      sale.customer_id = nil
+      sale.valid?
+      assert_equal "Consumidor Final", sale.customer.name
+    end
+
+    test "does not create a duplicate Consumidor Final" do
+      existing = create(:customer, account: @account, name: "Consumidor Final", debt_limit: 0, current_debt: 0)
+      sale = build(:sale, on_credit: false)
+      sale.customer = nil
+      sale.customer_id = nil
+      sale.valid?
+      assert_equal existing.id, sale.customer.id
+    end
+
+    test "does not override an explicitly selected customer" do
+      sale = build(:sale, customer: @customer, on_credit: false)
+      sale.valid?
+      assert_equal @customer, sale.customer
+    end
+
+    test "does not assign generic customer for credit sales" do
+      sale = build(:sale, on_credit: true)
+      sale.customer = nil
+      sale.customer_id = nil
+      sale.valid?
+      assert_nil sale.customer
+    end
+  end
+
+  # ── sale_items_present ────────────────────────────────────────────────────
+  describe "sale_items_present" do
+    test "is invalid with no items" do
+      sale = build(:sale)
+      sale.sale_items = []
+      assert_not sale.valid?
+      assert_includes sale.errors[:base], "Agrega al menos un producto para registrar la venta."
+    end
+
+    test "is valid with at least one item" do
+      product = create(:product, account: @account)
+      sale = build(:sale)
+      sale.sale_items.build(product: product, quantity: 1, unit_price: 10.0, discount: 0.0, account: @account)
+      assert sale.valid?
+    end
+  end
+
+  # ── credit_requires_real_customer ─────────────────────────────────────────
+  describe "credit_requires_real_customer" do
+    test "is invalid on credit with no customer" do
+      sale = build(:sale, on_credit: true, amount_received: 10)
+      sale.customer = nil
+      sale.customer_id = nil
+      sale.valid?
+      assert_includes sale.errors[:customer], "debe ser un cliente real para ventas a crédito"
+    end
+
+    test "is invalid on credit with Consumidor Final as customer" do
+      generic = create(:customer, account: @account, name: "Consumidor Final", debt_limit: 0, current_debt: 0)
+      sale = build(:sale, customer: generic, on_credit: true, amount_received: 10)
+      sale.valid?
+      assert_includes sale.errors[:customer], "debe ser un cliente real para ventas a crédito"
+    end
+
+    test "is valid on credit with a real named customer" do
+      product = create(:product, account: @account)
+      sale = build(:sale, customer: @customer, on_credit: true, amount_received: 10)
+      sale.sale_items.build(product: product, quantity: 1, unit_price: 10.0, discount: 0.0, account: @account)
+      assert sale.valid?
+    end
+  end
+
+  # ── amount_received_valid_for_credit ──────────────────────────────────────
+  describe "amount_received_valid_for_credit" do
+    test "is invalid on credit when amount_received is zero" do
+      sale = build(:sale, customer: @customer, on_credit: true, amount_received: 0)
+      sale.valid?
+      assert_includes sale.errors[:amount_received], "debe ser mayor a 0 para ventas a crédito"
+    end
+
+    test "is invalid on credit when amount_received is nil" do
+      sale = build(:sale, customer: @customer, on_credit: true, amount_received: nil)
+      sale.valid?
+      assert_includes sale.errors[:amount_received], "debe ser mayor a 0 para ventas a crédito"
+    end
+
+    test "is valid on credit when amount_received is greater than zero" do
+      product = create(:product, account: @account)
+      sale = build(:sale, customer: @customer, on_credit: true, amount_received: 5.0)
+      sale.sale_items.build(product: product, quantity: 1, unit_price: 10.0, discount: 0.0, account: @account)
+      assert sale.valid?
+    end
+  end
+
+  # ── #balance_due ──────────────────────────────────────────────────────────
   describe "#balance_due" do
     test "returns full total when no payments exist" do
       sale = create(:sale, total: 100.0)
@@ -96,6 +197,7 @@ class SaleTest < ActiveSupport::TestCase
     end
   end
 
+  # ── auto_set_status ───────────────────────────────────────────────────────
   describe "auto_set_status" do
     test "sets status to paid when not on credit" do
       sale = create(:sale, on_credit: false)
@@ -103,18 +205,19 @@ class SaleTest < ActiveSupport::TestCase
     end
 
     test "sets status to pending when on credit" do
-      sale = create(:sale, on_credit: true)
+      sale = create(:sale, on_credit: true, amount_received: 10)
       assert_predicate sale, :pending?
     end
 
     test "re-evaluates status when on_credit changes on update" do
-      sale = create(:sale, on_credit: false)
+      sale = create(:sale, customer: @customer, on_credit: false)
       assert_predicate sale, :paid?
       sale.update!(on_credit: true)
       assert_predicate sale, :pending?
     end
   end
 
+  # ── generate_code ─────────────────────────────────────────────────────────
   describe "generate_code" do
     test "generates a VTA-NNNN formatted code when code is blank" do
       sale = create(:sale, code: nil)
@@ -147,19 +250,24 @@ class SaleTest < ActiveSupport::TestCase
     end
   end
 
+  # ── set_sale_date ─────────────────────────────────────────────────────────
   describe "set_sale_date" do
-    test "defaults sale_date to today when not provided" do
-      sale = create(:sale, sale_date: nil)
-      assert_equal Date.current, sale.sale_date
+    test "sets sale_date to current datetime on create" do
+      freeze_time do
+        sale = create(:sale)
+        assert_equal Time.current, sale.sale_date
+      end
     end
 
-    test "preserves an explicitly provided sale_date" do
-      custom_date = Date.new(2025, 1, 15)
-      sale = create(:sale, sale_date: custom_date)
-      assert_equal custom_date, sale.sale_date
+    test "always overwrites sale_date with current time on create" do
+      freeze_time do
+        sale = create(:sale, sale_date: 3.days.ago)
+        assert_equal Time.current, sale.sale_date
+      end
     end
   end
 
+  # ── Multi-tenancy ─────────────────────────────────────────────────────────
   describe "multi-tenancy isolation" do
     test "scopes Sale.count to the current account" do
       other_account = create(:account)

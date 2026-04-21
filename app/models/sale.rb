@@ -16,7 +16,7 @@ class Sale < ApplicationRecord
   validates :code, uniqueness: { scope: :account_id }, allow_blank: true
   validates :total, numericality: { greater_than_or_equal_to: 0 }
   validate :sale_items_present
-  validate :amount_received_valid_for_credit, if: :on_credit?
+  validate :amount_received_valid_for_credit, if: -> { on_credit? && new_record? }
   validate :credit_requires_real_customer, if: :on_credit?
 
   before_validation :assign_generic_customer, unless: :on_credit?

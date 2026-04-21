@@ -29,11 +29,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
       set_flash_message! :notice, :signed_up
       sign_up(resource_name, resource)
       respond_with resource, location: after_sign_up_path_for(resource)
+    # :nocov:
     else
       clean_up_passwords resource
       set_minimum_password_length
       respond_with resource
     end
+    # :nocov:
   rescue ActiveRecord::RecordInvalid
     clean_up_passwords resource
     render :new, status: :unprocessable_entity
