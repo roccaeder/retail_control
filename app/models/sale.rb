@@ -16,6 +16,7 @@ class Sale < ApplicationRecord
 
   before_validation :auto_set_status
   before_create :generate_code
+  before_create :set_sale_date
 
   def balance_due
     (total - payments.sum(:amount)).round(2)
@@ -34,5 +35,9 @@ class Sale < ApplicationRecord
                       .where("code ~ ?", "^VTA-[0-9]+$")
                       .maximum("CAST(SUBSTRING(code FROM 5) AS INTEGER)") || 0
     self.code = "VTA-#{(last_number + 1).to_s.rjust(4, '0')}"
+  end
+  
+  def set_sale_date
+    self.sale_date ||= Date.current
   end
 end

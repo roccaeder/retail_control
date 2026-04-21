@@ -27,16 +27,22 @@ export default class extends Controller {
     const rowId = new Date().getTime()
     const subtotalRow = price * qty
 
-    let html = this.itemTemplateTarget.innerHTML
-      .replace(/NEW_ID/g, rowId)
-      .replace('data-label="name"',      `>${name}<`)
-      .replace('data-label="productId"', `value="${id}"`)
-      .replace('data-label="unitPrice"', `value="${price}"`)
-      .replace('data-label="quantity"',  `value="${qty}"`)
-      .replace('data-label="price"',     `>$${price.toFixed(2)}<`)
-      .replace('data-label="subtotal"',  `data-row-total="${subtotalRow.toFixed(2)}">$${subtotalRow.toFixed(2)}<`)
+    const fragment = this.itemTemplateTarget.content.cloneNode(true)
+    const row = fragment.querySelector("tr")
 
-    this.tableBodyTarget.insertAdjacentHTML('beforeend', html)
+    row.innerHTML = row.innerHTML.replace(/NEW_ID/g, rowId)
+
+    row.querySelector('[data-label="name"]').textContent = name
+    row.querySelector('[data-label="productId"]').value  = id
+    row.querySelector('[data-label="unitPrice"]').value  = price
+    row.querySelector('[data-label="quantity"]').value   = qty
+    row.querySelector('[data-label="price"]').textContent = `$${price.toFixed(2)}`
+
+    const subtotalEl = row.querySelector('[data-label="subtotal"]')
+    subtotalEl.setAttribute("data-row-total", subtotalRow.toFixed(2))
+    subtotalEl.textContent = `$${subtotalRow.toFixed(2)}`
+
+    this.tableBodyTarget.appendChild(fragment)
     select.value = ""
     this.quantityInputTarget.value = 1
 

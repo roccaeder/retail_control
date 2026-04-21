@@ -23,7 +23,7 @@ class SalesController < ApplicationController
     @sale.account = current_tenant
 
     if @sale.sale_items.empty?
-      flash.now[:alert] = "Agrega al menos un producto para registrar la venta."
+      @sale.errors.add(:base, "Agrega al menos un producto para registrar la venta.")
       load_form_data
       render :new, status: :unprocessable_entity
       return
@@ -31,12 +31,11 @@ class SalesController < ApplicationController
 
     ActiveRecord::Base.transaction do
       @sale.save!
-      register_initial_payment if initial_payment_amount.positive?
+      register_initial_payment
     end
 
     redirect_to sales_path, notice: "Venta #{@sale.code} registrada correctamente."
-  rescue ActiveRecord::RecordInvalid => e
-    flash.now[:alert] = e.message
+  rescue ActiveRecord::RecordInvalid
     load_form_data
     render :new, status: :unprocessable_entity
   end
@@ -65,16 +64,12 @@ class SalesController < ApplicationController
   def register_initial_payment
     result = Payments::RegisterPaymentService.call(
       sale:           @sale,
-      amount:         initial_payment_amount,
+      amount:         @sale.total,
       payment_method: @sale.payment_method,
       date:           Date.current
     )
 
     raise ActiveRecord::RecordInvalid.new(@sale) unless result.success
-  end
-
-  def initial_payment_amount
-    params[:initial_payment_amount].to_d
   end
 
   def load_form_data

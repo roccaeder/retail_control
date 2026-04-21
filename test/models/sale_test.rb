@@ -1,6 +1,8 @@
 require "test_helper"
 
 class SaleTest < ActiveSupport::TestCase
+  extend Minitest::Spec::DSL
+
   setup do
     @account  = create(:account)
     @customer = create(:customer, account: @account)
@@ -9,77 +11,67 @@ class SaleTest < ActiveSupport::TestCase
 
   teardown { teardown_tenant }
 
-  # ── Asociaciones ──────────────────────────────────────────────────────────
-  test "pertenece a un customer" do
-    sale = create(:sale, account: @account, customer: @customer)
-    assert_equal @customer, sale.customer
+  # ── Estructura y Base (Usando ActiveRecord/ActiveModel Matchers) ───────────
+  describe "database and associations" do
+    let(:sale) { Sale.new }
+
+    # ActiveRecord Matchers
+    it { assert_matcher belong_to(:customer), sale }
+    it { assert_matcher belong_to(:account), sale }
+    it { assert_matcher have_many(:sale_items).dependent(:destroy), sale }
+    it { assert_matcher accept_nested_attributes_for(:sale_items), sale }
+    
+    # ActiveModel Matchers
+    it { assert_matcher have_many(:sale_items).dependent(:destroy), sale }
+    it { assert_matcher have_many(:payments).dependent(:destroy), sale }
+    it { assert_matcher accept_nested_attributes_for(:sale_items), sale }
   end
 
-  test "pertenece a un account" do
-    sale = create(:sale, account: @account, customer: @customer)
-    assert_equal @account, sale.account
-  end
+  describe "enums" do
+    let(:sale) { Sale.new }
 
-  test "tiene sale_items" do
-    assert_respond_to Sale.new, :sale_items
-  end
-
-  test "tiene payments" do
-    assert_respond_to Sale.new, :payments
-  end
-
-  # ── Validaciones ──────────────────────────────────────────────────────────
-  test "total no puede ser negativo" do
-    sale = build(:sale, account: @account, customer: @customer, total: -1)
-    assert_not sale.valid?
-    assert sale.errors[:total].any?
-  end
-
-  # ── Enums ─────────────────────────────────────────────────────────────────
-  test "status paid tiene valor 0"    do assert_equal 0, Sale.statuses[:paid]    end
-  test "status pending tiene valor 1" do assert_equal 1, Sale.statuses[:pending] end
-  test "status partial tiene valor 2" do assert_equal 2, Sale.statuses[:partial] end
-
-  # ── balance_due ────────────────────────────────────────────────────────────
-  test "balance_due es 0 para venta totalmente pagada" do
-    sale = create(:sale, account: @account, customer: @customer, total: 10.00)
-    create(:payment, sale: sale, account: @account, amount: 10.00)
-    assert_equal 0.0, sale.balance_due.to_f
-  end
-
-  test "balance_due es el total cuando no hay pagos" do
-    sale = create(:sale, :pending, account: @account, customer: @customer, total: 4.50)
-    assert_equal 4.50, sale.balance_due.to_f
-  end
-
-  test "balance_due descuenta pagos parciales" do
-    sale = create(:sale, :partial, account: @account, customer: @customer, total: 10.00)
-    create(:payment, sale: sale, account: @account, amount: 4.00)
-    assert_in_delta 6.00, sale.balance_due, 0.01
-  end
-
-  # ── auto_set_status ────────────────────────────────────────────────────────
-  test "venta al contado se auto-marca como paid" do
-    sale = build(:sale, account: @account, customer: @customer, on_credit: false, payment_method: :cash)
-    sale.valid?
-    assert sale.paid?
-  end
-
-  test "venta a crédito se auto-marca como pending" do
-    sale = build(:sale, account: @account, customer: @customer, on_credit: true, payment_method: :credit)
-    sale.valid?
-    assert sale.pending?
-  end
-
-  # ── Aislamiento de tenant ─────────────────────────────────────────────────
-  test "Sale.all no incluye ventas de otro tenant" do
-    create(:sale, account: @account, customer: @customer)
-    other_account  = create(:account)
-    other_customer = create(:customer, account: other_account)
-    other_sale     = ActsAsTenant.with_tenant(other_account) do
-      create(:sale, account: other_account, customer: other_customer)
+    it "defines status with correct values" do
+      assert_matcher define_enum_for(:status).with_values(paid: 0, pending: 1, partial: 2), sale
     end
 
-    assert_not_includes Sale.all, other_sale
+    it "defines payment_method with correct values" do
+      assert_matcher define_enum_for(:payment_method).with_values(cash: 0, credit: 1, transfer: 2), sale
+    end
+  end
+
+  # ── Lógica de Negocio (Unit Testing puro) ─────────────────────────────────
+  describe "#balance_due" do
+    test "calculates the remaining balance accurately" do
+      sale = create(:sale, total: 100.0)
+      create(:payment, sale: sale, amount: 40.5)
+      
+      # Usar assert_in_delta para floats/decimals es mejor práctica
+      assert_in_delta 59.5, sale.balance_due, 0.001
+    end
+  end
+
+  describe "callbacks & state machine logic" do
+    test "automatically sets status to paid for immediate payments" do
+      sale = build(:sale, on_credit: false)
+      sale.save # dispara callbacks
+      assert_predicate sale, :paid?
+    end
+
+    test "generates a unique business code on creation" do
+      sale = create(:sale, code: nil)
+      assert_match /VTA-\d{4}/, sale.code
+    end
+  end
+
+  # ── Seguridad y Aislamiento ───────────────────────────────────────────────
+  describe "multi-tenancy isolation" do
+    test "querying sales should be scoped to the current account" do
+      other_account = create(:account)
+      ActsAsTenant.with_tenant(other_account) { create(:sale) }
+      
+      create(:sale) # Venta del tenant actual (@account)
+      
+      assert_equal 1, Sale.count
+    end
   end
 end

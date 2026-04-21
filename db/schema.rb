@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_17_000008) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,6 +79,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_000008) do
     t.decimal "discount_amount", precision: 10, scale: 2, default: "0.0"
     t.boolean "on_credit", default: false, null: false
     t.integer "payment_method"
+    t.date "sale_date"
     t.integer "status"
     t.decimal "subtotal", precision: 10, scale: 2, default: "0.0"
     t.decimal "total", precision: 10, scale: 2, default: "0.0"

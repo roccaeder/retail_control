@@ -78,11 +78,14 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
       payment_method = on_credit ? :credit : [ :cash, :transfer ].sample
       discount = [ 0, 0, 0, 5, 10, 20 ].sample
 
+      sale_date = Date.today - rand(0..90)
+
       sale = Sale.new(
         customer:        customer,
         payment_method:  payment_method,
         on_credit:       on_credit,
         discount_amount: discount,
+        sale_date:       sale_date,
         account:         account
       )
 

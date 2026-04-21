@@ -14,12 +14,11 @@ end
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "minitest/spec"
 
-# ── WebMock: bloquea llamadas HTTP reales en tests ───────────────────────────
 require "webmock/minitest"
 WebMock.disable_net_connect!(allow_localhost: true)
 
-# ── Shoulda Matchers ─────────────────────────────────────────────────────────
 require "shoulda/matchers"
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -30,9 +29,10 @@ end
 
 module ActiveSupport
   class TestCase
+    extend Minitest::Spec::DSL 
+
     include FactoryBot::Syntax::Methods
 
-    # ── Helpers de tenant ──────────────────────────────────────────────────
     def setup_tenant(account)
       ActsAsTenant.current_tenant = account
     end
@@ -41,8 +41,6 @@ module ActiveSupport
       ActsAsTenant.current_tenant = nil
     end
 
-    # ── Shoulda Matchers helper ────────────────────────────────────────────
-    # Uso: assert_matcher validate_presence_of(:name), record
     def assert_matcher(matcher, subject)
       assert matcher.matches?(subject), matcher.failure_message
     end
@@ -55,6 +53,8 @@ end
 
 # Devise helpers para ActionDispatch::IntegrationTest
 class ActionDispatch::IntegrationTest
+  extend Minitest::Spec::DSL
+  
   include FactoryBot::Syntax::Methods
   include Devise::Test::IntegrationHelpers
 end
