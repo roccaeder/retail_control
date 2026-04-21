@@ -106,7 +106,7 @@ jobs:
 
       - name: Subir reporte HTML de coverage como artefacto
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage/
