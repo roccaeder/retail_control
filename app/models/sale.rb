@@ -36,7 +36,7 @@ class Sale < ApplicationRecord
                       .maximum("CAST(SUBSTRING(code FROM 5) AS INTEGER)") || 0
     self.code = "VTA-#{(last_number + 1).to_s.rjust(4, '0')}"
   end
-  
+
   def set_sale_date
     self.sale_date ||= Date.current
   end

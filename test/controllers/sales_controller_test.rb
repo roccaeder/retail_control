@@ -39,7 +39,7 @@ class SalesControllerTest < ActionDispatch::IntegrationTest
     end
 
     test "should render index and new" do
-      [sales_path, new_sale_path].each do |path|
+      [ sales_path, new_sale_path ].each do |path|
         get path
         assert_response :success
       end

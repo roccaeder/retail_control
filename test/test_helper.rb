@@ -29,7 +29,7 @@ end
 
 module ActiveSupport
   class TestCase
-    extend Minitest::Spec::DSL 
+    extend Minitest::Spec::DSL
 
     include FactoryBot::Syntax::Methods
 
@@ -54,7 +54,7 @@ end
 # Devise helpers para ActionDispatch::IntegrationTest
 class ActionDispatch::IntegrationTest
   extend Minitest::Spec::DSL
-  
+
   include FactoryBot::Syntax::Methods
   include Devise::Test::IntegrationHelpers
 end
