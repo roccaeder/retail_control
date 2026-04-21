@@ -8,3 +8,15 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+.field_with_errors input,
+.field_with_errors select,
+.field_with_errors textarea {
+  border-color: #f43f5e !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.25);
+}
+
+.field_with_errors label {
+  color: #f43f5e;
+}

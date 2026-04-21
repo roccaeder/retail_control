@@ -22,6 +22,8 @@ services:
       RAILS_ENV: development
     depends_on:
       - db
+    stdin_open: true  # Corresponde a -i
+    tty: true         # Corresponde a -t
 
 volumes:
   postgres_data:

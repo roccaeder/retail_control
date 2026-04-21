@@ -41,16 +41,7 @@ module Payments
 
     def update_sale_status(sale)
       balance = sale.reload.balance_due
-
-      new_status = if balance <= 0
-                     :paid
-      elsif balance < sale.total
-                     :partial
-      else
-                     :pending
-      end
-
-      # Evitar el callback auto_set_status (que depende de on_credit) al actualizar status.
+      new_status = balance <= 0 ? :paid : :partial
       sale.update_column(:status, Sale.statuses[new_status])
     end
 
