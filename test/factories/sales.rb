@@ -5,7 +5,7 @@ FactoryBot.define do
       sale.customer ||= create(:customer, account: sale.account)
       if sale.sale_items.empty?
         sale.sale_items.build(
-          product:    build(:product, account: sale.account),
+          product:    create(:product, account: sale.account),
           quantity:   1,
           unit_price: 10.0,
           discount:   0.0,

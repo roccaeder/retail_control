@@ -23,6 +23,7 @@ class Sale < ApplicationRecord
   before_validation :auto_set_status
   before_create :generate_code
   before_create :set_sale_date
+  before_create :update_product_stock
 
   def balance_due
     (total - payments.sum(:amount)).round(2)
@@ -69,5 +70,17 @@ class Sale < ApplicationRecord
 
   def set_sale_date
     self.sale_date = Time.current
+  end
+
+  def update_product_stock
+    sale_items.each do |item|
+      product = Product.find(item.product_id)
+      product.stock -= item.quantity.to_i
+      if product.stock < 0
+        errors.add(:base, "Stock insuficiente para #{product.name}. Stock disponible: #{product.stock + item.quantity.to_i}")
+        raise ActiveRecord::RecordInvalid.new(self)
+      end
+      product.save!
+    end
   end
 end
