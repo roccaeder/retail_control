@@ -112,6 +112,34 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # ── Consumidor Final (cliente genérico) ────────────────────────────────────
+  describe "generic customer protection" do
+    setup do
+      @generic = create(:customer, account: @account, name: "Consumidor Final", debt_limit: 0, current_debt: 0)
+    end
+
+    test "cannot edit Consumidor Final" do
+      get edit_customer_path(@generic)
+      assert_redirected_to customers_path
+      assert_match /no puede modificarse/, flash[:alert]
+    end
+
+    test "cannot update Consumidor Final" do
+      patch customer_path(@generic), params: { customer: { name: "Otro" } }
+      assert_redirected_to customers_path
+      assert_match /no puede modificarse/, flash[:alert]
+      assert_equal "Consumidor Final", @generic.reload.name
+    end
+
+    test "cannot destroy Consumidor Final" do
+      assert_no_difference "Customer.count" do
+        delete customer_path(@generic)
+      end
+      assert_redirected_to customers_path
+      assert_match /no puede modificarse/, flash[:alert]
+    end
+  end
+
   # ── GET edit ───────────────────────────────────────────────────────────────
   describe "GET #edit" do
     test "renders the edit form" do

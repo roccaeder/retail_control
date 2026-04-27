@@ -93,16 +93,18 @@
                 <%= customer.created_at.strftime("%d/%m/%Y") %>
               </td>
               <td class="px-6 py-3.5 text-right">
-                <div class="flex items-center justify-end gap-3">
-                  <%= link_to edit_customer_path(customer), class: "text-xs font-semibold text-stone-400 hover:text-emerald-600 transition-colors" do %>
-                    Editar
-                  <% end %>
-                  <%= button_to customer_path(customer), method: :delete,
-                        data: { turbo_confirm: "¿Eliminar a #{customer.name}? Esta acción no se puede deshacer." },
-                        class: "text-xs font-semibold text-stone-400 hover:text-rose-600 transition-colors bg-transparent border-0 cursor-pointer p-0" do %>
-                    Eliminar
-                  <% end %>
-                </div>
+                <% unless customer.generic? %>
+                  <div class="flex items-center justify-end gap-3">
+                    <%= link_to edit_customer_path(customer), class: "text-xs font-semibold text-stone-400 hover:text-emerald-600 transition-colors" do %>
+                      Editar
+                    <% end %>
+                    <%= button_to customer_path(customer), method: :delete,
+                          data: { turbo_confirm: "¿Eliminar a #{customer.name}? Esta acción no se puede deshacer." },
+                          class: "text-xs font-semibold text-stone-400 hover:text-rose-600 transition-colors bg-transparent border-0 cursor-pointer p-0" do %>
+                      Eliminar
+                    <% end %>
+                  </div>
+                <% end %>
               </td>
             </tr>
           <% end %>

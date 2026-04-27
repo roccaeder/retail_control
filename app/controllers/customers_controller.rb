@@ -1,6 +1,7 @@
 class CustomersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_customer, only: %i[show edit update destroy]
+  before_action :reject_generic_customer, only: %i[edit update destroy]
   layout "erp"
 
   def index
@@ -47,6 +48,11 @@ class CustomersController < ApplicationController
 
   def set_customer
     @customer = Customer.find(params[:id])
+  end
+
+  def reject_generic_customer
+    return unless @customer.generic?
+    redirect_to customers_path, alert: "El cliente 'Consumidor Final' no puede modificarse."
   end
 
   def customer_params
