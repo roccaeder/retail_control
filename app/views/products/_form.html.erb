@@ -1,0 +1,76 @@
+<%= form_with(model: product, class: "space-y-5") do |f| %>
+
+  <% if product.errors.any? %>
+    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 text-sm text-rose-700">
+      <p class="font-semibold mb-1">No se pudo guardar el producto:</p>
+      <ul class="list-disc list-inside space-y-0.5">
+        <% product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5" data-controller="product-form">
+
+    <%# ── Nombre y SKU ─────────────────────────────────────── %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div>
+        <%= f.label :name, "Nombre", class: "block text-sm font-semibold text-stone-700 mb-1.5" %>
+        <%= f.text_field :name,
+              class: "w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-stone-800 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent",
+              placeholder: "Ej: Coca Cola 500ml" %>
+      </div>
+      <div>
+        <%= f.label :sku, "SKU", class: "block text-sm font-semibold text-stone-700 mb-1.5" %>
+        <%= f.text_field :sku,
+              class: "w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-stone-800 font-mono placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent",
+              placeholder: "Ej: CC-500 (opcional)" %>
+      </div>
+    </div>
+
+    <%# ── Precios y stock ──────────────────────────────────── %>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div>
+        <%= f.label :cost_price, "Precio de costo", class: "block text-sm font-semibold text-stone-700 mb-1.5" %>
+        <div class="flex rounded-xl border border-stone-200 focus-within:ring-2 focus-within:ring-violet-500 focus-within:border-transparent overflow-hidden">
+          <span class="flex items-center px-3 text-sm text-stone-400 bg-stone-50 border-r border-stone-100 select-none">$</span>
+          <%= f.number_field :cost_price, step: "0.01", min: "0",
+                class: "flex-1 py-2 px-3 text-sm text-stone-800 focus:outline-none bg-white",
+                placeholder: "0.00",
+                data: { product_form_target: "costPrice", action: "input->product-form#calculate" } %>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <%= f.label :sale_price, "Precio de venta", class: "text-sm font-semibold text-stone-700" %>
+          <span data-product-form-target="margin"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-stone-100 text-stone-500">—</span>
+        </div>
+        <div class="flex rounded-xl border border-stone-200 focus-within:ring-2 focus-within:ring-violet-500 focus-within:border-transparent overflow-hidden">
+          <span class="flex items-center px-3 text-sm text-stone-400 bg-stone-50 border-r border-stone-100 select-none">$</span>
+          <%= f.number_field :sale_price, step: "0.01", min: "0",
+                class: "flex-1 py-2 px-3 text-sm text-stone-800 focus:outline-none bg-white",
+                placeholder: "0.00",
+                data: { product_form_target: "salePrice", action: "input->product-form#calculate" } %>
+        </div>
+      </div>
+      <div>
+        <%= f.label :stock, "Stock inicial", class: "block text-sm font-semibold text-stone-700 mb-1.5" %>
+        <%= f.number_field :stock, min: "0",
+              class: "w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent",
+              placeholder: "0" %>
+      </div>
+    </div>
+
+  </div>
+
+  <%# ── Acciones ─────────────────────────────────────────────── %>
+  <div class="flex items-center justify-end gap-3">
+    <%= link_to "Cancelar", products_path,
+          class: "px-4 py-2 text-sm font-semibold text-stone-600 hover:text-stone-800 transition-colors" %>
+    <%= f.submit product.persisted? ? "Guardar cambios" : "Crear producto",
+          class: "inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-colors shadow-sm cursor-pointer" %>
+  </div>
+
+<% end %>

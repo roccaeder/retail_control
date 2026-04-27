@@ -55,6 +55,7 @@
             <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Precio Venta</th>
             <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Margen</th>
             <th class="px-6 py-3 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-stone-50">
@@ -103,6 +104,18 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Disponible
                   </span>
                 <% end %>
+              </td>
+              <td class="px-6 py-3.5 text-right">
+                <div class="flex items-center justify-end gap-3">
+                  <%= link_to edit_product_path(product), class: "text-xs font-semibold text-stone-400 hover:text-violet-600 transition-colors" do %>
+                    Editar
+                  <% end %>
+                  <%= button_to product_path(product), method: :delete,
+                        data: { turbo_confirm: "¿Eliminar #{product.name}? Esta acción no se puede deshacer." },
+                        class: "text-xs font-semibold text-stone-400 hover:text-rose-600 transition-colors bg-transparent border-0 cursor-pointer p-0" do %>
+                    Eliminar
+                  <% end %>
+                </div>
               </td>
             </tr>
           <% end %>
