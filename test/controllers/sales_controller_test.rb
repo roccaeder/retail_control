@@ -107,6 +107,14 @@ class SalesControllerTest < ActionDispatch::IntegrationTest
       assert_match /registrada correctamente/, flash[:notice]
     end
 
+    test "should decrease stock of products when sale is created" do
+      assert_difference -> { @product1.reload.stock } => -2, -> { @product2.reload.stock } => -1 do
+        post sales_path, params: sale_params
+      end
+
+      assert_redirected_to sales_path # o el path que uses tras guardar
+    end
+
     test "returns 422 when no items are submitted" do
       params = sale_params
       params[:sale][:sale_items_attributes] = {}

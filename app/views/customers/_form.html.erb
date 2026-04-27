@@ -1,0 +1,54 @@
+<%= form_with(model: customer, class: "space-y-5") do |f| %>
+
+  <% if customer.errors.any? %>
+    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 text-sm text-rose-700">
+      <p class="font-semibold mb-1">No se pudo guardar el cliente:</p>
+      <ul class="list-disc list-inside space-y-0.5">
+        <% customer.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm space-y-5">
+
+    <%# ── Nombre y Teléfono ───────────────────────────────── %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div>
+        <%= f.label :name, "Nombre", class: "block text-sm font-semibold text-stone-700 mb-1.5" %>
+        <%= f.text_field :name,
+              class: "w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-stone-800 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent",
+              placeholder: "Ej: Juan Pérez" %>
+      </div>
+      <div>
+        <%= f.label :phone, "Teléfono", class: "block text-sm font-semibold text-stone-700 mb-1.5" %>
+        <%= f.text_field :phone,
+              class: "w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-stone-800 placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent",
+              placeholder: "Ej: 912 345 678 (opcional)" %>
+      </div>
+    </div>
+
+    <%# ── Límite de crédito ───────────────────────────────── %>
+    <div class="sm:w-1/2">
+      <%= f.label :debt_limit, "Límite de crédito", class: "block text-sm font-semibold text-stone-700 mb-1.5" %>
+      <div class="flex rounded-xl border border-stone-200 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-transparent overflow-hidden">
+        <span class="flex items-center px-3 text-sm text-stone-400 bg-stone-50 border-r border-stone-100 select-none">$</span>
+        <%= f.number_field :debt_limit, step: "0.01", min: "0",
+              class: "flex-1 py-2 px-3 text-sm text-stone-800 focus:outline-none bg-white",
+              placeholder: "0.00" %>
+      </div>
+      <p class="mt-1.5 text-xs text-stone-400">Máximo que puede deber. Usá 0 para no permitir crédito.</p>
+    </div>
+
+  </div>
+
+  <%# ── Acciones ─────────────────────────────────────────────── %>
+  <div class="flex items-center justify-end gap-3">
+    <%= link_to "Cancelar", customers_path,
+          class: "px-4 py-2 text-sm font-semibold text-stone-600 hover:text-stone-800 transition-colors" %>
+    <%= f.submit customer.persisted? ? "Guardar cambios" : "Crear cliente",
+          class: "inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-colors shadow-sm cursor-pointer" %>
+  </div>
+
+<% end %>

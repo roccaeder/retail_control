@@ -10,4 +10,8 @@ class Customer < ApplicationRecord
   def within_debt_limit?
     current_debt <= debt_limit
   end
+
+  def generic?
+    name == "Consumidor Final"
+  end
 end

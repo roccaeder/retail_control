@@ -267,6 +267,28 @@ class SaleTest < ActiveSupport::TestCase
     end
   end
 
+  # ── update_product_stock ──────────────────────────────────────────────────
+  describe "update_product_stock" do
+    setup do
+      @product = create(:product, account: @account, stock: 10)
+    end
+
+    test "reduces stock for each sale item on create" do
+      sale = build(:sale, account: @account, customer: @customer)
+      sale.sale_items.build(product: @product, quantity: 3, unit_price: @product.sale_price, discount: 0.0, account: @account)
+      sale.save!
+      assert_equal 7, @product.reload.stock
+    end
+
+    test "raises RecordInvalid and adds error when stock is insufficient" do
+      sale = build(:sale, account: @account, customer: @customer)
+      sale.sale_items.build(product: @product, quantity: 15, unit_price: @product.sale_price, discount: 0.0, account: @account)
+
+      assert_raises(ActiveRecord::RecordInvalid) { sale.save! }
+      assert_match /Stock insuficiente para #{@product.name}/, sale.errors[:base].to_s
+    end
+  end
+
   # ── Multi-tenancy ─────────────────────────────────────────────────────────
   describe "multi-tenancy isolation" do
     test "scopes Sale.count to the current account" do
