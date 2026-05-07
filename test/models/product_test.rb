@@ -55,6 +55,29 @@ class ProductTest < ActiveSupport::TestCase
     end
   end
 
+  # ── search scope ──────────────────────────────────────────────────────────
+  describe "search scope" do
+    test "filters by name" do
+      match  = create(:product, account: @account, name: "Coca Cola")
+      other  = create(:product, account: @account, name: "Pepsi")
+      assert_includes Product.search("Coca"), match
+      assert_not_includes Product.search("Coca"), other
+    end
+
+    test "filters by SKU" do
+      match = create(:product, account: @account, sku: "CC-500")
+      other = create(:product, account: @account, sku: "PP-350")
+      assert_includes Product.search("CC-500"), match
+      assert_not_includes Product.search("CC-500"), other
+    end
+
+    test "returns all products when query is blank" do
+      create(:product, account: @account)
+      assert_equal Product.count, Product.search("").count
+      assert_equal Product.count, Product.search(nil).count
+    end
+  end
+
   # ── Aislamiento de tenant ─────────────────────────────────────────────────
   test "no devuelve productos de otro tenant" do
     create(:product, account: @account)

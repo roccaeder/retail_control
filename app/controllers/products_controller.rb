@@ -4,7 +4,7 @@ class ProductsController < ApplicationController
   layout "erp"
 
   def index
-    @products = Product.order(:name)
+    @pagy, @products = pagy(Product.search(params[:q]).order(:name))
   end
 
   def show

@@ -289,6 +289,49 @@ class SaleTest < ActiveSupport::TestCase
     end
   end
 
+  # ── Scopes de búsqueda ────────────────────────────────────────────────────
+  describe "search scope" do
+    test "returns sales matching by code" do
+      sale = create(:sale, code: "VTA-0099")
+      other = create(:sale, code: "VTA-0001")
+      assert_includes Sale.search("VTA-0099"), sale
+      assert_not_includes Sale.search("VTA-0099"), other
+    end
+
+    test "returns sales matching by customer name" do
+      named = create(:customer, account: @account, name: "Pepito Grillo")
+      sale  = create(:sale, customer: named)
+      assert_includes Sale.search("Pepito"), sale
+    end
+
+    test "returns all sales when query is blank" do
+      create(:sale)
+      assert_equal Sale.count, Sale.search("").count
+      assert_equal Sale.count, Sale.search(nil).count
+    end
+  end
+
+  describe "by_status scope" do
+    test "filters by valid status" do
+      paid    = create(:sale, on_credit: false)
+      pending = create(:sale, on_credit: true, amount_received: 5)
+
+      assert_includes Sale.by_status("paid"), paid
+      assert_not_includes Sale.by_status("paid"), pending
+    end
+
+    test "returns all sales when status is blank" do
+      create(:sale)
+      assert_equal Sale.count, Sale.by_status("").count
+      assert_equal Sale.count, Sale.by_status(nil).count
+    end
+
+    test "returns all sales when status is not a valid key" do
+      create(:sale)
+      assert_equal Sale.count, Sale.by_status("invalid").count
+    end
+  end
+
   # ── Multi-tenancy ─────────────────────────────────────────────────────────
   describe "multi-tenancy isolation" do
     test "scopes Sale.count to the current account" do

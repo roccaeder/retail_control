@@ -46,6 +46,29 @@ class CustomerTest < ActiveSupport::TestCase
     assert_not build(:customer, debt_limit: 500, current_debt: 501).within_debt_limit?
   end
 
+  # ── search scope ──────────────────────────────────────────────────────────
+  describe "search scope" do
+    test "filters by name" do
+      match = create(:customer, account: @account, name: "Pepito Grillo")
+      other = create(:customer, account: @account, name: "Juan Pérez")
+      assert_includes Customer.search("Pepito"), match
+      assert_not_includes Customer.search("Pepito"), other
+    end
+
+    test "filters by phone" do
+      match = create(:customer, account: @account, phone: "1122334455")
+      other = create(:customer, account: @account, phone: "9988776655")
+      assert_includes Customer.search("1122334455"), match
+      assert_not_includes Customer.search("1122334455"), other
+    end
+
+    test "returns all customers when query is blank" do
+      create(:customer, account: @account)
+      assert_equal Customer.count, Customer.search("").count
+      assert_equal Customer.count, Customer.search(nil).count
+    end
+  end
+
   # ── Aislamiento de tenant ─────────────────────────────────────────────────
   test "solo devuelve clientes del tenant actual" do
     create(:customer, account: @account)

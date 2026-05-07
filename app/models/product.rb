@@ -3,6 +3,10 @@ class Product < ApplicationRecord
 
   has_many :sale_items, dependent: :restrict_with_error
 
+  scope :search, ->(q) {
+    q.present? ? where("name ILIKE ? OR sku ILIKE ?", "%#{q}%", "%#{q}%") : all
+  }
+
   validates :name, presence: true
   validates :sale_price, numericality: { greater_than_or_equal_to: 0 }
   validates :cost_price, numericality: { greater_than_or_equal_to: 0 }

@@ -4,7 +4,12 @@ class SalesController < ApplicationController
   before_action :set_sale, only: [ :show ]
 
   def index
-    @sales = Sale.includes(:customer, :payments).order(created_at: :desc)
+    status = params[:status]
+    sales = Sale.includes(:customer, :payments)
+                .search(params[:q])
+                .then { |r| status == "today" ? r.today : r.by_status(status) }
+                .order(created_at: :desc)
+    @pagy, @sales = pagy(sales)
   end
 
   def show
