@@ -43,6 +43,12 @@ class SalesControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select "[data-test='customer-name']", minimum: 2
     end
+
+    test "filters by today status" do
+      ActsAsTenant.with_tenant(@account) { create(:sale) }
+      get sales_path, params: { status: "today" }
+      assert_response :success
+    end
   end
 
   # ── GET new ───────────────────────────────────────────────────────────────

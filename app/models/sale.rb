@@ -13,6 +13,12 @@ class Sale < ApplicationRecord
   enum :status, { paid: 0, pending: 1, partial: 2 }
   enum :payment_method, { cash: 0, credit: 1, transfer: 2 }
 
+  scope :search, ->(q) {
+    q.present? ? joins(:customer).where("sales.code ILIKE :q OR customers.name ILIKE :q", q: "%#{q}%") : all
+  }
+  scope :by_status, ->(s) { s.present? && statuses.key?(s) ? where(status: s) : all }
+  scope :today,     -> { where(sale_date: Time.zone.today.all_day) }
+
   validates :code, uniqueness: { scope: :account_id }, allow_blank: true
   validates :total, numericality: { greater_than_or_equal_to: 0 }
   validate :sale_items_present

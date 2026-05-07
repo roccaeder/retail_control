@@ -5,7 +5,7 @@ class CustomersController < ApplicationController
   layout "erp"
 
   def index
-    @customers = Customer.order(:name)
+    @pagy, @customers = pagy(Customer.search(params[:q]).order(:name))
   end
 
   def show

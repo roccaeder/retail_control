@@ -1,18 +1,160 @@
-<h1>Venta <%= @sale.code %></h1>
+<% content_for :page_title, "Venta #{@sale.code}" %>
 
-<p>Cliente: <%= @sale.customer.name %></p>
-<p>Total: $<%= @sale.total %></p>
-<p>Saldo pendiente: $<%= @sale.balance_due %></p>
-<p>Estado: <%= @sale.status %></p>
+<div class="space-y-5 max-w-4xl mx-auto">
 
-<h2>Ítems</h2>
-<% @sale.sale_items.each do |item| %>
-  <div><%= item.product.name %> × <%= item.quantity %> — $<%= item.unit_price %></div>
-<% end %>
+  <%# ── Header ─────────────────────────────────────────────── %>
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-bold text-stone-800"><%= @sale.code.presence || "Venta ##{@sale.id}" %></h1>
+      <p class="text-sm text-stone-400 mt-0.5"><%= @sale.sale_date&.strftime("%d/%m/%Y a las %H:%M") %></p>
+    </div>
+    <%= link_to sales_path, class: "text-sm text-stone-500 hover:text-stone-700 font-semibold px-2 py-2 transition-colors" do %>
+      ← Volver
+    <% end %>
+  </div>
 
-<h2>Pagos</h2>
-<% @payments.each do |payment| %>
-  <div><%= payment.date %> — $<%= payment.amount %> (<%= payment.payment_method %>)</div>
-<% end %>
+  <%# ── KPI cards ───────────────────────────────────────────── %>
+  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl border border-stone-100 p-4 shadow-sm">
+      <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Total</p>
+      <p class="mt-1.5 text-2xl font-bold text-stone-800">$<%= number_with_precision(@sale.total, precision: 2, delimiter: ",") %></p>
+    </div>
+    <div class="bg-white rounded-2xl border border-stone-100 p-4 shadow-sm">
+      <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Saldo pendiente</p>
+      <p class="mt-1.5 text-2xl font-bold <%= @sale.balance_due > 0 ? 'text-rose-600' : 'text-stone-400' %>">
+        $<%= number_with_precision(@sale.balance_due, precision: 2, delimiter: ",") %>
+      </p>
+    </div>
+    <div class="bg-white rounded-2xl border border-stone-100 p-4 shadow-sm">
+      <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Descuento</p>
+      <p class="mt-1.5 text-2xl font-bold text-stone-500">
+        <%= @sale.discount_amount > 0 ? "-$#{number_with_precision(@sale.discount_amount, precision: 2, delimiter: ',')}" : "—" %>
+      </p>
+    </div>
+    <div class="bg-white rounded-2xl border border-stone-100 p-4 shadow-sm">
+      <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Estado</p>
+      <div class="mt-2">
+        <% if @sale.paid? %>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-semibold bg-emerald-50 text-emerald-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Pagado
+          </span>
+        <% elsif @sale.partial? %>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-semibold bg-amber-50 text-amber-700">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Parcial
+          </span>
+        <% else %>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-semibold bg-rose-50 text-rose-700">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Pendiente
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-<%= link_to "Volver", sales_path %>
+  <%# ── Info cliente ────────────────────────────────────────── %>
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-stone-50">
+      <h3 class="text-sm font-bold text-stone-700">Información de la venta</h3>
+    </div>
+    <dl class="divide-y divide-stone-50">
+      <div class="px-6 py-3.5 flex justify-between items-center">
+        <dt class="text-sm text-stone-500">Cliente</dt>
+        <dd class="text-sm font-semibold text-stone-800"><%= @sale.customer.name %></dd>
+      </div>
+      <div class="px-6 py-3.5 flex justify-between items-center">
+        <dt class="text-sm text-stone-500">Método de pago</dt>
+        <dd class="text-sm text-stone-700">
+          <% if @sale.cash? %>Efectivo
+          <% elsif @sale.transfer? %>Transferencia
+          <% elsif @sale.credit? %>Crédito
+          <% end %>
+          <% if @sale.on_credit? %>
+            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700">A Crédito</span>
+          <% end %>
+        </dd>
+      </div>
+      <div class="px-6 py-3.5 flex justify-between items-center">
+        <dt class="text-sm text-stone-500">Subtotal</dt>
+        <dd class="text-sm text-stone-600">$<%= number_with_precision(@sale.subtotal, precision: 2, delimiter: ",") %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <%# ── Items ──────────────────────────────────────────────── %>
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-stone-50">
+      <h3 class="text-sm font-bold text-stone-700">Productos</h3>
+    </div>
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-stone-50">
+          <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Producto</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider">Cant.</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Precio unit.</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Descuento</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-stone-50">
+        <% @sale.sale_items.each do |item| %>
+          <% item_subtotal = item.unit_price * item.quantity - item.discount.to_f %>
+          <tr class="hover:bg-stone-50/60 transition-colors">
+            <td class="px-6 py-3.5 text-sm font-semibold text-stone-700"><%= item.product.name %></td>
+            <td class="px-6 py-3.5 text-center text-sm text-stone-600"><%= item.quantity %></td>
+            <td class="px-6 py-3.5 text-right text-sm text-stone-600">$<%= number_with_precision(item.unit_price, precision: 2, delimiter: ",") %></td>
+            <td class="px-6 py-3.5 text-right text-sm">
+              <% if item.discount.to_f > 0 %>
+                <span class="text-rose-500">-$<%= number_with_precision(item.discount, precision: 2, delimiter: ",") %></span>
+              <% else %>
+                <span class="text-stone-300">—</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-3.5 text-right text-sm font-semibold text-stone-800">$<%= number_with_precision(item_subtotal, precision: 2, delimiter: ",") %></td>
+          </tr>
+        <% end %>
+        <tr class="bg-stone-50/60">
+          <td colspan="4" class="px-6 py-3 text-right text-sm font-bold text-stone-700">Total</td>
+          <td class="px-6 py-3 text-right text-sm font-bold text-stone-900">$<%= number_with_precision(@sale.total, precision: 2, delimiter: ",") %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <%# ── Pagos ──────────────────────────────────────────────── %>
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-stone-50 flex items-center justify-between">
+      <h3 class="text-sm font-bold text-stone-700">Pagos recibidos</h3>
+      <span class="text-xs text-stone-400"><%= @payments.count %> pago<%= @payments.count == 1 ? "" : "s" %></span>
+    </div>
+    <% if @payments.any? %>
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-stone-50">
+            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Método</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Monto</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-stone-50">
+          <% @payments.each do |payment| %>
+            <tr class="hover:bg-stone-50/60 transition-colors">
+              <td class="px-6 py-3.5 text-sm text-stone-600"><%= payment.date&.strftime("%d/%m/%Y") %></td>
+              <td class="px-6 py-3.5 text-sm text-stone-600">
+                <% if payment.cash? %>Efectivo
+                <% elsif payment.transfer? %>Transferencia
+                <% elsif payment.credit? %>Crédito
+                <% end %>
+              </td>
+              <td class="px-6 py-3.5 text-right text-sm font-semibold text-emerald-700">
+                $<%= number_with_precision(payment.amount, precision: 2, delimiter: ",") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="px-6 py-8 text-sm text-stone-400 text-center">Sin pagos registrados.</p>
+    <% end %>
+  </div>
+
+</div>
