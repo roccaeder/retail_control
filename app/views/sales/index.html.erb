@@ -102,7 +102,7 @@
           <% @sales.each do |sale| %>
             <tr class="hover:bg-stone-50/60 transition-colors">
               <td class="px-6 py-3.5 text-xs font-mono">
-                <%= link_to sale_path(sale), class: "text-stone-400 hover:text-emerald-600 transition-colors font-semibold" do %>
+                <%= link_to sale_path(sale), data: { turbo_frame: "_top" }, class: "text-stone-400 hover:text-emerald-600 transition-colors font-semibold" do %>
                   <%= sale.code.presence || "##{sale.id}" %>
                 <% end %>
               </td>
@@ -173,7 +173,7 @@
                 <span class="block text-stone-300"><%= sale.sale_date.strftime("%H:%M") %></span>
               </td>
               <td class="px-6 py-3.5 text-right">
-                <%= link_to sale_path(sale), class: "text-xs font-semibold text-stone-400 hover:text-emerald-600 transition-colors" do %>
+                <%= link_to sale_path(sale), data: { turbo_frame: "_top" }, class: "text-xs font-semibold text-stone-400 hover:text-emerald-600 transition-colors" do %>
                   Ver →
                 <% end %>
               </td>
