@@ -312,12 +312,23 @@ class SaleTest < ActiveSupport::TestCase
   end
 
   describe "by_status scope" do
-    test "filters by valid status" do
+    test "filters paid sales" do
       paid    = create(:sale, on_credit: false)
       pending = create(:sale, on_credit: true, amount_received: 5)
 
       assert_includes Sale.by_status("paid"), paid
       assert_not_includes Sale.by_status("paid"), pending
+    end
+
+    test "pending filter includes both pending and partial sales" do
+      pending = create(:sale, on_credit: true, amount_received: 5)
+      partial = create(:sale, :partial, account: @account)
+      paid    = create(:sale, on_credit: false)
+
+      result = Sale.by_status("pending")
+      assert_includes result, pending
+      assert_includes result, partial
+      assert_not_includes result, paid
     end
 
     test "returns all sales when status is blank" do

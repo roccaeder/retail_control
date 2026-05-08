@@ -16,7 +16,13 @@ class Sale < ApplicationRecord
   scope :search, ->(q) {
     q.present? ? joins(:customer).where("sales.code ILIKE :q OR customers.name ILIKE :q", q: "%#{q}%") : all
   }
-  scope :by_status, ->(s) { s.present? && statuses.key?(s) ? where(status: s) : all }
+  scope :by_status, ->(s) {
+    case s
+    when "pending" then where(status: [ :pending, :partial ])
+    when ->(v) { v.present? && statuses.key?(v) } then where(status: s)
+    else all
+    end
+  }
   scope :today,     -> { where(sale_date: Time.zone.today.all_day) }
 
   validates :code, uniqueness: { scope: :account_id }, allow_blank: true

@@ -10,7 +10,9 @@ Rails.application.routes.draw do
   resources :products do
     get "search", on: :collection
   end
-  resources :sales
+  resources :sales do
+    resources :payments, only: [ :new, :create ]
+  end
 
   # Rutas de salud del sistema (Rails 8)
   get "up" => "rails/health#show", as: :rails_health_check
