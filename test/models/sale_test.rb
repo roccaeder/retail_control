@@ -343,6 +343,24 @@ class SaleTest < ActiveSupport::TestCase
     end
   end
 
+  # ── link_stock_movement_origins ───────────────────────────────────────────
+  describe "link_stock_movement_origins" do
+    test "es no-op cuando @new_movement_ids está vacío" do
+      sale = create(:sale, account: @account, customer: @customer)
+      sale.instance_variable_set(:@new_movement_ids, [])
+      assert_no_difference -> { StockMovement.count } do
+        sale.send(:link_stock_movement_origins)
+      end
+    end
+
+    test "crea la venta y el stock_movement queda vinculado al sale" do
+      sale = create(:sale, account: @account, customer: @customer)
+      movement = StockMovement.where(origin_type: "Sale", origin_id: sale.id).first
+      assert_not_nil movement
+      assert_equal sale.id, movement.origin_id
+    end
+  end
+
   # ── Multi-tenancy ─────────────────────────────────────────────────────────
   describe "multi-tenancy isolation" do
     test "scopes Sale.count to the current account" do

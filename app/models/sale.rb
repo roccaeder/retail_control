@@ -38,6 +38,7 @@ class Sale < ApplicationRecord
   before_create :generate_code
   before_create :set_sale_date
   before_create :update_product_stock
+  after_create  :link_stock_movement_origins
 
   def balance_due
     (total - payments.sum(:amount)).round(2)
@@ -87,14 +88,24 @@ class Sale < ApplicationRecord
   end
 
   def update_product_stock
+    @new_movement_ids = []
     sale_items.each do |item|
-      product = Product.find(item.product_id)
-      product.stock -= item.quantity.to_i
-      if product.stock < 0
-        errors.add(:base, "Stock insuficiente para #{product.name}. Stock disponible: #{product.stock + item.quantity.to_i}")
+      result = Inventory::RegisterMovementService.call(
+        product:       Product.find(item.product_id),
+        quantity:      item.quantity.to_i,
+        movement_type: :sale
+      )
+      unless result.success
+        errors.add(:base, result.errors.first)
         raise ActiveRecord::RecordInvalid.new(self)
       end
-      product.save!
+      @new_movement_ids << result.movement.id
     end
+  end
+
+  def link_stock_movement_origins
+    return if @new_movement_ids.blank?
+    StockMovement.where(id: @new_movement_ids)
+                 .update_all(origin_type: "Sale", origin_id: id)
   end
 end

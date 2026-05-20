@@ -34,5 +34,11 @@ class DashboardController < ApplicationController
       .limit(5)
 
     @recent_sales = Sale.includes(:customer).order(created_at: :desc).limit(8)
+
+    @cash_flow_month = Reports::CashFlowQuery.call(
+      account: current_tenant,
+      from:    today.beginning_of_month,
+      to:      today
+    )
   end
 end

@@ -14,6 +14,13 @@ Rails.application.routes.draw do
     resources :payments, only: [ :new, :create ]
   end
 
+  resources :suppliers
+  resources :purchases do
+    member { patch :receive }
+  end
+
+  resources :expenses, only: [ :index, :new, :create, :destroy ]
+
   # Rutas de salud del sistema (Rails 8)
   get "up" => "rails/health#show", as: :rails_health_check
 end

@@ -1,0 +1,128 @@
+<% content_for :page_title, "Gastos" %>
+
+<div class="space-y-5 max-w-7xl mx-auto">
+
+  <%# ── Header ─────────────────────────────────────────────── %>
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-bold text-stone-800">Gastos</h1>
+      <p class="text-sm text-stone-400 mt-0.5">Egresos del negocio</p>
+    </div>
+    <%= link_to new_expense_path, class: "inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nuevo Gasto
+    <% end %>
+  </div>
+
+  <%# ── Flujo de caja del mes ──────────────────────────────── %>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Ingresos del mes</p>
+          <p class="mt-2 text-2xl font-bold text-emerald-600">
+            $<%= number_with_precision(@cash_flow[:inflows], precision: 2, delimiter: ",") %>
+          </p>
+        </div>
+        <div class="p-2.5 bg-emerald-50 rounded-xl">
+          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+      </div>
+      <p class="mt-2 text-xs text-stone-400">Pagos cobrados este mes</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Egresos del mes</p>
+          <p class="mt-2 text-2xl font-bold text-rose-600">
+            $<%= number_with_precision(@cash_flow[:outflows], precision: 2, delimiter: ",") %>
+          </p>
+        </div>
+        <div class="p-2.5 bg-rose-50 rounded-xl">
+          <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17H5m0 0v-8m0 8l8-8 4 4 6-6"/>
+          </svg>
+        </div>
+      </div>
+      <p class="mt-2 text-xs text-stone-400">Gastos registrados este mes</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Flujo neto</p>
+          <p class="mt-2 text-2xl font-bold <%= @cash_flow[:net] >= 0 ? 'text-emerald-700' : 'text-rose-700' %>">
+            $<%= number_with_precision(@cash_flow[:net], precision: 2, delimiter: ",") %>
+          </p>
+        </div>
+        <div class="p-2.5 <%= @cash_flow[:net] >= 0 ? 'bg-emerald-50' : 'bg-rose-50' %> rounded-xl">
+          <svg class="w-5 h-5 <%= @cash_flow[:net] >= 0 ? 'text-emerald-500' : 'text-rose-500' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="mt-2 text-xs text-stone-400">Ingresos menos egresos del mes</p>
+    </div>
+  </div>
+
+  <%# ── Tabla de gastos ────────────────────────────────────── %>
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+    <% if @expenses.any? %>
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-stone-100">
+            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Categoría</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Descripción</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Proveedor</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Monto</th>
+            <th class="px-6 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-stone-50">
+          <% @expenses.each do |expense| %>
+            <tr class="hover:bg-stone-50/60 transition-colors">
+              <td class="px-6 py-3.5 text-sm text-stone-500">
+                <%= expense.date.strftime("%d/%m/%Y") %>
+              </td>
+              <td class="px-6 py-3.5">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700">
+                  <%= expense.category %>
+                </span>
+              </td>
+              <td class="px-6 py-3.5 text-sm text-stone-600">
+                <%= expense.description.presence || "—" %>
+              </td>
+              <td class="px-6 py-3.5 text-sm text-stone-500">
+                <%= expense.supplier&.name || "—" %>
+              </td>
+              <td class="px-6 py-3.5 text-right text-sm font-bold text-rose-700">
+                $<%= number_with_precision(expense.amount, precision: 2, delimiter: ",") %>
+              </td>
+              <td class="px-6 py-3.5 text-right">
+                <%= button_to expense_path(expense), method: :delete,
+                      class: "text-xs text-stone-400 hover:text-rose-600 font-medium transition-colors",
+                      data: { turbo_confirm: "¿Eliminar este gasto?" } do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="py-16 text-center">
+        <p class="text-sm text-stone-400">No hay gastos registrados aún.</p>
+        <%= link_to "Registrar primer gasto →", new_expense_path, class: "mt-2 inline-block text-sm text-rose-600 font-semibold" %>
+      </div>
+    <% end %>
+  </div>
+
+</div>

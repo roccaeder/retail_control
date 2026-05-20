@@ -1,0 +1,27 @@
+<tr data-purchase-form-target="row">
+  <td class="px-4 py-2.5">
+    <%= pf.select :product_id, options_from_collection_for_select(products, :id, :name, pf.object.product_id),
+          { include_blank: "Seleccionar…" },
+          class: "w-full rounded-lg border border-stone-200 px-2.5 py-1.5 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-400",
+          data: { action: "change->purchase-form#recalculate" } %>
+  </td>
+  <td class="px-4 py-2.5">
+    <%= pf.number_field :quantity, value: pf.object.quantity || 1, min: 1,
+          class: "w-20 rounded-lg border border-stone-200 px-2.5 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-emerald-400",
+          data: { action: "input->purchase-form#recalculate", purchase_form_target: "quantity" } %>
+  </td>
+  <td class="px-4 py-2.5">
+    <%= pf.number_field :unit_cost, value: pf.object.unit_cost || 0, min: 0, step: "0.01",
+          class: "w-28 rounded-lg border border-stone-200 px-2.5 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-emerald-400",
+          data: { action: "input->purchase-form#recalculate", purchase_form_target: "unitCost" } %>
+  </td>
+  <td class="px-4 py-2.5 text-right text-sm font-semibold text-stone-700 w-24" data-purchase-form-target="rowSubtotal">$0.00</td>
+  <td class="px-4 py-2.5 text-center">
+    <button type="button" data-action="click->purchase-form#removeRow"
+            class="text-rose-400 hover:text-rose-600 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </td>
+</tr>

@@ -93,6 +93,37 @@
     </div>
   </div>
 
+  <%# ── Flujo de caja del mes ──────────────────────────────────── %>
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-stone-50 flex items-center justify-between">
+      <h3 class="text-sm font-bold text-stone-700">Flujo de Caja — Mes Actual</h3>
+      <%= link_to "Ver gastos →", expenses_path, class: "text-xs text-rose-600 hover:text-rose-700 font-semibold" %>
+    </div>
+    <div class="grid grid-cols-3 divide-x divide-stone-50">
+      <div class="px-6 py-4">
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Ingresos</p>
+        <p class="mt-1.5 text-xl font-bold text-emerald-600">
+          $<%= number_with_precision(@cash_flow_month[:inflows], precision: 2, delimiter: ",") %>
+        </p>
+        <p class="mt-0.5 text-xs text-stone-400">Pagos cobrados</p>
+      </div>
+      <div class="px-6 py-4">
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Egresos</p>
+        <p class="mt-1.5 text-xl font-bold text-rose-600">
+          $<%= number_with_precision(@cash_flow_month[:outflows], precision: 2, delimiter: ",") %>
+        </p>
+        <p class="mt-0.5 text-xs text-stone-400">Gastos registrados</p>
+      </div>
+      <div class="px-6 py-4">
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Neto</p>
+        <p class="mt-1.5 text-xl font-bold <%= @cash_flow_month[:net] >= 0 ? 'text-emerald-700' : 'text-rose-700' %>">
+          $<%= number_with_precision(@cash_flow_month[:net], precision: 2, delimiter: ",") %>
+        </p>
+        <p class="mt-0.5 text-xs text-stone-400">Ingresos − Egresos</p>
+      </div>
+    </div>
+  </div>
+
   <%# ── Middle row: Top productos + Alertas de deuda ───────────── %>
   <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
 
