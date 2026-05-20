@@ -1,7 +1,9 @@
 class Product < ApplicationRecord
   acts_as_tenant(:account)
 
+  belongs_to :account
   has_many :sale_items, dependent: :restrict_with_error
+  has_many :stock_movements, dependent: :destroy
 
   scope :search, ->(q) {
     q.present? ? where("name ILIKE ? OR sku ILIKE ?", "%#{q}%", "%#{q}%") : all

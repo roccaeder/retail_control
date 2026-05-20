@@ -1,7 +1,9 @@
 class Payment < ApplicationRecord
   acts_as_tenant(:account)
 
+  belongs_to :account
   belongs_to :sale
+  has_one :customer, through: :sale
 
   enum :payment_method, { cash: 0, credit: 1, transfer: 2 }
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_20_212045) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_000001) do
     t.string "phone"
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_customers_on_account_id"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.string "description"
+    t.bigint "payable_id"
+    t.string "payable_type"
+    t.bigint "supplier_id"
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "date"], name: "index_expenses_on_account_id_and_date"
+    t.index ["account_id"], name: "index_expenses_on_account_id"
+    t.index ["supplier_id"], name: "index_expenses_on_supplier_id"
   end
 
   create_table "payments", force: :cascade do |t|
@@ -54,7 +70,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_000001) do
     t.string "sku"
     t.integer "stock"
     t.datetime "updated_at", null: false
+    t.index ["account_id", "sku"], name: "index_products_on_account_id_and_sku", unique: true, where: "((sku IS NOT NULL) AND ((sku)::text <> ''::text))"
     t.index ["account_id"], name: "index_products_on_account_id"
+  end
+
+  create_table "purchase_items", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "product_id", null: false
+    t.bigint "purchase_id", null: false
+    t.integer "quantity", null: false
+    t.decimal "unit_cost", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_purchase_items_on_account_id"
+    t.index ["product_id"], name: "index_purchase_items_on_product_id"
+    t.index ["purchase_id"], name: "index_purchase_items_on_purchase_id"
+  end
+
+  create_table "purchases", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.string "invoice_number"
+    t.date "received_date"
+    t.integer "status", default: 0, null: false
+    t.bigint "supplier_id", null: false
+    t.decimal "total", precision: 10, scale: 2, default: "0.0"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_purchases_on_account_id"
+    t.index ["supplier_id"], name: "index_purchases_on_supplier_id"
   end
 
   create_table "sale_items", force: :cascade do |t|
@@ -89,6 +132,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_000001) do
     t.index ["customer_id"], name: "index_sales_on_customer_id"
   end
 
+  create_table "stock_movements", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.integer "movement_type", null: false
+    t.bigint "origin_id"
+    t.string "origin_type"
+    t.bigint "product_id", null: false
+    t.integer "quantity", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "product_id"], name: "index_stock_movements_on_account_id_and_product_id"
+    t.index ["account_id"], name: "index_stock_movements_on_account_id"
+    t.index ["origin_type", "origin_id"], name: "index_stock_movements_on_origin"
+    t.index ["product_id"], name: "index_stock_movements_on_product_id"
+  end
+
+  create_table "suppliers", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name", null: false
+    t.string "phone"
+    t.string "ruc_or_nit"
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_suppliers_on_account_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
@@ -104,13 +174,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_000001) do
   end
 
   add_foreign_key "customers", "accounts"
+  add_foreign_key "expenses", "accounts"
+  add_foreign_key "expenses", "suppliers"
   add_foreign_key "payments", "accounts"
   add_foreign_key "payments", "sales"
   add_foreign_key "products", "accounts"
+  add_foreign_key "purchase_items", "accounts"
+  add_foreign_key "purchase_items", "products"
+  add_foreign_key "purchase_items", "purchases"
+  add_foreign_key "purchases", "accounts"
+  add_foreign_key "purchases", "suppliers"
   add_foreign_key "sale_items", "accounts"
   add_foreign_key "sale_items", "products"
   add_foreign_key "sale_items", "sales"
   add_foreign_key "sales", "accounts"
   add_foreign_key "sales", "customers"
+  add_foreign_key "stock_movements", "accounts"
+  add_foreign_key "stock_movements", "products"
+  add_foreign_key "suppliers", "accounts"
   add_foreign_key "users", "accounts"
 end

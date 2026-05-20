@@ -2,7 +2,7 @@
 
 <div class="space-y-6 max-w-7xl mx-auto">
 
-  <%# ── Header row ──────────────────────────────────────────── %>
+  <%# ── Header ────────────────────────────────────────────────── %>
   <div class="flex items-center justify-between">
     <div>
       <h1 class="text-xl font-bold text-stone-800">Resumen del Negocio</h1>
@@ -13,185 +13,220 @@
     </span>
   </div>
 
-  <%# ── KPI Cards ────────────────────────────────────────────── %>
+  <%# ── KPI Cards ──────────────────────────────────────────────── %>
   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
-    <%# Ventas totales %>
-    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Ventas Totales</p>
-          <p class="mt-2 text-2xl font-bold text-stone-800">
-            $<%= number_with_precision(Sale.sum(:total), precision: 2, delimiter: ",") %>
-          </p>
-        </div>
-        <div class="p-2.5 bg-emerald-50 rounded-xl">
-          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-      </div>
-      <div class="mt-3 flex items-center gap-1 text-xs text-stone-400">
-        <span class="text-emerald-500 font-semibold"><%= Sale.count %></span> ventas registradas
-      </div>
-    </div>
-
-    <%# Ventas del día %>
-    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
       <div class="flex items-start justify-between">
         <div>
           <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Ventas Hoy</p>
           <p class="mt-2 text-2xl font-bold text-stone-800">
-            $<%= number_with_precision(Sale.where(created_at: Time.zone.today.all_day).sum(:total), precision: 2, delimiter: ",") %>
+            $<%= number_with_precision(@total_today, precision: 2, delimiter: ",") %>
+          </p>
+        </div>
+        <div class="p-2.5 bg-emerald-50 rounded-xl">
+          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+      </div>
+      <p class="mt-3 text-xs text-stone-400">
+        <span class="text-emerald-600 font-semibold"><%= @count_today %></span> transacciones hoy
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Últimos 7 días</p>
+          <p class="mt-2 text-2xl font-bold text-stone-800">
+            $<%= number_with_precision(@total_week, precision: 2, delimiter: ",") %>
           </p>
         </div>
         <div class="p-2.5 bg-teal-50 rounded-xl">
           <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
         </div>
       </div>
-      <div class="mt-3 flex items-center gap-1 text-xs text-stone-400">
-        <span class="text-teal-500 font-semibold"><%= Sale.where(created_at: Time.zone.today.all_day).count %></span> transacciones hoy
-      </div>
+      <p class="mt-3 text-xs text-stone-400">
+        Mes: <span class="text-teal-600 font-semibold">$<%= number_with_precision(@total_month, precision: 2, delimiter: ",") %></span>
+      </p>
     </div>
 
-    <%# Cartera de fiados %>
-    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
       <div class="flex items-start justify-between">
         <div>
           <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Cartera Fiados</p>
           <p class="mt-2 text-2xl font-bold text-stone-800">
-            $<%= number_with_precision(Customer.sum(:current_debt), precision: 2, delimiter: ",") %>
+            $<%= number_with_precision(@pending_debt, precision: 2, delimiter: ",") %>
           </p>
         </div>
         <div class="p-2.5 bg-amber-50 rounded-xl">
           <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
         </div>
       </div>
-      <div class="mt-3 flex items-center gap-1 text-xs text-stone-400">
-        <span class="text-amber-500 font-semibold"><%= Customer.where("current_debt > 0").count %></span> clientes con deuda
-      </div>
+      <p class="mt-3 text-xs text-stone-400">
+        <span class="text-amber-600 font-semibold"><%= @customers_debt %></span> clientes con saldo pendiente
+      </p>
     </div>
 
-    <%# Stock bajo %>
-    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-2xl border border-stone-100 p-5 shadow-sm">
       <div class="flex items-start justify-between">
         <div>
-          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Stock Bajo</p>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Stock Crítico</p>
           <p class="mt-2 text-2xl font-bold text-stone-800">
-            <%= Product.where("stock < ?", 10).count %> ítems
+            <%= @low_stock_count %> ítems
           </p>
         </div>
         <div class="p-2.5 bg-rose-50 rounded-xl">
           <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
           </svg>
         </div>
       </div>
-      <div class="mt-3 flex items-center gap-1 text-xs text-stone-400">
-        <span class="text-rose-500 font-semibold"><%= Product.count %></span> productos en total
+      <p class="mt-3 text-xs text-stone-400">
+        <span class="text-rose-600 font-semibold"><%= @out_of_stock %></span> sin stock
+      </p>
+    </div>
+  </div>
+
+  <%# ── Flujo de caja del mes ──────────────────────────────────── %>
+  <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-stone-50 flex items-center justify-between">
+      <h3 class="text-sm font-bold text-stone-700">Flujo de Caja — Mes Actual</h3>
+      <%= link_to "Ver gastos →", expenses_path, class: "text-xs text-rose-600 hover:text-rose-700 font-semibold" %>
+    </div>
+    <div class="grid grid-cols-3 divide-x divide-stone-50">
+      <div class="px-6 py-4">
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Ingresos</p>
+        <p class="mt-1.5 text-xl font-bold text-emerald-600">
+          $<%= number_with_precision(@cash_flow_month[:inflows], precision: 2, delimiter: ",") %>
+        </p>
+        <p class="mt-0.5 text-xs text-stone-400">Pagos cobrados</p>
+      </div>
+      <div class="px-6 py-4">
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Egresos</p>
+        <p class="mt-1.5 text-xl font-bold text-rose-600">
+          $<%= number_with_precision(@cash_flow_month[:outflows], precision: 2, delimiter: ",") %>
+        </p>
+        <p class="mt-0.5 text-xs text-stone-400">Gastos registrados</p>
+      </div>
+      <div class="px-6 py-4">
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Neto</p>
+        <p class="mt-1.5 text-xl font-bold <%= @cash_flow_month[:net] >= 0 ? 'text-emerald-700' : 'text-rose-700' %>">
+          $<%= number_with_precision(@cash_flow_month[:net], precision: 2, delimiter: ",") %>
+        </p>
+        <p class="mt-0.5 text-xs text-stone-400">Ingresos − Egresos</p>
       </div>
     </div>
   </div>
 
-  <%# ── Quick-access shortcuts ────────────────────────────────── %>
-  <div class="grid grid-cols-3 gap-3">
-    <%= link_to sales_path, class: "bg-white border border-stone-100 rounded-2xl p-4 flex items-center gap-3 hover:border-emerald-200 hover:shadow-md transition-all group" do %>
-      <div class="p-2 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors">
-        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-xs font-bold text-stone-700">Ventas</p>
-        <p class="text-xs text-stone-400"><%= Sale.count %> registros</p>
-      </div>
-    <% end %>
+  <%# ── Middle row: Top productos + Alertas de deuda ───────────── %>
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
 
-    <%= link_to customers_path, class: "bg-white border border-stone-100 rounded-2xl p-4 flex items-center gap-3 hover:border-teal-200 hover:shadow-md transition-all group" do %>
-      <div class="p-2 bg-teal-50 rounded-xl group-hover:bg-teal-100 transition-colors">
-        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-        </svg>
+    <%# Top 5 productos más vendidos %>
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-50">
+        <h3 class="text-sm font-bold text-stone-700">Top Productos Vendidos</h3>
       </div>
-      <div>
-        <p class="text-xs font-bold text-stone-700">Clientes</p>
-        <p class="text-xs text-stone-400"><%= Customer.count %> registrados</p>
-      </div>
-    <% end %>
+      <% if @top_products.any? %>
+        <ul class="divide-y divide-stone-50">
+          <% @top_products.each_with_index do |item, i| %>
+            <li class="px-6 py-3.5 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-600 text-xs font-bold shrink-0">
+                  <%= i + 1 %>
+                </span>
+                <span class="text-sm font-medium text-stone-700"><%= item.name %></span>
+              </div>
+              <span class="text-sm font-bold text-stone-500">
+                <%= item.total_sold %> <span class="text-xs font-normal text-stone-400">uds.</span>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-6 py-8 text-sm text-stone-400 text-center">Sin ventas registradas aún.</p>
+      <% end %>
+    </div>
 
-    <%= link_to products_path, class: "bg-white border border-stone-100 rounded-2xl p-4 flex items-center gap-3 hover:border-violet-200 hover:shadow-md transition-all group" do %>
-      <div class="p-2 bg-violet-50 rounded-xl group-hover:bg-violet-100 transition-colors">
-        <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-        </svg>
+    <%# Clientes cerca del límite de crédito %>
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-50 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-stone-700">Clientes Cerca del Límite</h3>
+        <span class="text-xs text-stone-400">&gt;80% del crédito usado</span>
       </div>
-      <div>
-        <p class="text-xs font-bold text-stone-700">Inventario</p>
-        <p class="text-xs text-stone-400"><%= Product.count %> productos</p>
-      </div>
-    <% end %>
+      <% if @customers_near_limit.any? %>
+        <ul class="divide-y divide-stone-50">
+          <% @customers_near_limit.each do |customer| %>
+            <% pct = customer.debt_limit > 0 ? (customer.current_debt / customer.debt_limit * 100).round : 100 %>
+            <li class="px-6 py-3.5">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-stone-700"><%= customer.name %></span>
+                <span class="text-xs font-bold <%= pct >= 100 ? 'text-rose-600' : 'text-amber-600' %>"><%= pct %>%</span>
+              </div>
+              <div class="w-full bg-stone-100 rounded-full h-1.5">
+                <div class="h-1.5 rounded-full <%= pct >= 100 ? 'bg-rose-500' : 'bg-amber-400' %>"
+                     style="width: <%= [pct, 100].min %>%"></div>
+              </div>
+              <p class="mt-1 text-xs text-stone-400">
+                $<%= number_with_precision(customer.current_debt, precision: 2) %> de $<%= number_with_precision(customer.debt_limit, precision: 2) %>
+              </p>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-6 py-8 text-sm text-stone-400 text-center">Todos los clientes están dentro de su límite.</p>
+      <% end %>
+    </div>
   </div>
 
-  <%# ── Last sales table ─────────────────────────────────────── %>
+  <%# ── Últimas transacciones ───────────────────────────────────── %>
   <div class="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-stone-50 flex items-center justify-between">
       <h3 class="text-sm font-bold text-stone-700">Últimas Transacciones</h3>
-      <%= link_to "Ver todas", sales_path, class: "text-xs text-emerald-600 hover:text-emerald-700 font-medium" %>
+      <%= link_to "Ver todas →", sales_path, class: "text-xs text-emerald-600 hover:text-emerald-700 font-semibold" %>
     </div>
 
-    <% recent_sales = Sale.includes(:customer).order(created_at: :desc).limit(8) %>
-    <% if recent_sales.any? %>
+    <% if @recent_sales.any? %>
       <table class="w-full">
         <thead>
           <tr class="border-b border-stone-50">
             <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Cliente</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Total</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Método</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-stone-400 uppercase tracking-wider">Total</th>
+            <th class="px-6 py-3 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider">Estado</th>
             <th class="px-6 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">Fecha</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-stone-50">
-          <% recent_sales.each do |sale| %>
+          <% @recent_sales.each do |sale| %>
             <tr class="hover:bg-stone-50/60 transition-colors">
               <td class="px-6 py-3.5">
                 <div class="flex items-center gap-2.5">
-                  <div class="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 text-xs font-bold">
+                  <div class="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 text-xs font-bold shrink-0">
                     <%= sale.customer.name[0].upcase %>
                   </div>
                   <span class="text-sm font-medium text-stone-700"><%= sale.customer.name %></span>
                 </div>
               </td>
-              <td class="px-6 py-3.5 text-sm font-semibold text-stone-800">
+              <td class="px-6 py-3.5 text-right text-sm font-bold text-stone-800">
                 $<%= number_with_precision(sale.total, precision: 2, delimiter: ",") %>
               </td>
-              <td class="px-6 py-3.5">
-                <span class="text-xs text-stone-500">
-                  <% if sale.payment_method == "cash" %>Efectivo
-                  <% elsif sale.payment_method == "credit" %>Fiado
-                  <% elsif sale.payment_method == "transfer" %>Transferencia
-                  <% end %>
-                </span>
-              </td>
-              <td class="px-6 py-3.5">
+              <td class="px-6 py-3.5 text-center">
                 <% if sale.paid? %>
                   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Pagado
                   </span>
-                <% else %>
+                <% elsif sale.partial? %>
                   <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pendiente
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Parcial
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Pendiente
                   </span>
                 <% end %>
               </td>
@@ -204,10 +239,6 @@
       </table>
     <% else %>
       <div class="py-16 text-center">
-        <svg class="w-10 h-10 text-stone-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-        </svg>
         <p class="text-sm text-stone-400">No hay transacciones aún</p>
       </div>
     <% end %>
