@@ -1,6 +1,7 @@
 class Customer < ApplicationRecord
   acts_as_tenant(:account)
 
+  belongs_to :account
   has_many :sales, dependent: :restrict_with_error
 
   scope :search, ->(q) {

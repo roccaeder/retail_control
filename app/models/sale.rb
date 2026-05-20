@@ -1,9 +1,11 @@
 class Sale < ApplicationRecord
   acts_as_tenant(:account)
 
+  belongs_to :account
   belongs_to :customer
   has_many :sale_items, dependent: :destroy
   has_many :payments, dependent: :destroy
+  has_many :products, through: :sale_items
 
   accepts_nested_attributes_for :sale_items, reject_if: :all_blank
 

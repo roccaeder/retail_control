@@ -1,6 +1,7 @@
 class SaleItem < ApplicationRecord
   acts_as_tenant(:account)
 
+  belongs_to :account
   belongs_to :sale
   belongs_to :product
 
