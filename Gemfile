@@ -25,7 +25,7 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 gem "bootsnap", require: false
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.0"
 
 # --- Deployment ---
 gem "kamal", require: false
