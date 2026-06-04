@@ -83,7 +83,7 @@ GEM
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
-    avo (3.31.2)
+    avo (3.32.0)
       actionview (>= 6.1)
       active_link_to
       activerecord (>= 6.1)
@@ -98,7 +98,7 @@ GEM
       turbo_power (>= 0.6.0)
       view_component (>= 3.7.0)
       zeitwerk (>= 2.6.12)
-    avo-icons (0.1.4)
+    avo-icons (0.1.5)
       inline_svg
     base64 (0.3.0)
     bcrypt (3.1.22)
@@ -175,7 +175,7 @@ GEM
     jbuilder (2.15.0)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (2.19.5)
+    json (2.19.8)
     kamal (2.11.0)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -260,7 +260,7 @@ GEM
       actionpack (>= 7.0.0)
       activesupport (>= 7.0.0)
       rack
-    psych (5.3.1)
+    psych (5.4.0)
       date
       stringio
     public_suffix (7.0.5)
@@ -430,7 +430,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.8.1)
+    zeitwerk (2.8.2)
 
 PLATFORMS
   aarch64-linux
