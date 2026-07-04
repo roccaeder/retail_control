@@ -8,22 +8,22 @@ class ApplicationHelperTest < ActionView::TestCase
     "/?page=#{options[:page]}"
   end
 
-  FakePagy = Struct.new(:prev, :next, :series, keyword_init: true)
+  FakePagy = Struct.new(:previous, :next, :page, :pages, keyword_init: true)
 
-  def make_pagy(prev: nil, nxt: nil, series: [ "1" ])
-    FakePagy.new(prev: prev, next: nxt, series: series)
+  def make_pagy(previous: nil, nxt: nil, page: 1, pages: 1)
+    FakePagy.new(previous: previous, next: nxt, page: page, pages: pages)
   end
 
-  # ── pagy.prev ─────────────────────────────────────────────────────────────
+  # ── pagy.previous ─────────────────────────────────────────────────────────
   describe "previous page" do
-    test "renders a link when prev page exists" do
-      html = pagy_tailwind_nav(make_pagy(prev: 1, series: [ "2" ]))
+    test "renders a link when previous page exists" do
+      html = pagy_tailwind_nav(make_pagy(previous: 1, page: 2, pages: 2))
       assert_includes html, 'href="/?page=1"'
       assert_includes html, "←"
     end
 
-    test "renders a disabled span when no prev page" do
-      html = pagy_tailwind_nav(make_pagy(prev: nil, series: [ "1" ]))
+    test "renders a disabled span when no previous page" do
+      html = pagy_tailwind_nav(make_pagy(previous: nil, page: 1, pages: 1))
       assert_includes html, "cursor-default"
       assert_includes html, "←"
       assert_not_includes html, 'href="/?page="'
@@ -33,40 +33,31 @@ class ApplicationHelperTest < ActionView::TestCase
   # ── pagy.next ─────────────────────────────────────────────────────────────
   describe "next page" do
     test "renders a link when next page exists" do
-      html = pagy_tailwind_nav(make_pagy(nxt: 3, series: [ "2" ]))
+      html = pagy_tailwind_nav(make_pagy(nxt: 3, page: 2, pages: 3))
       assert_includes html, 'href="/?page=3"'
       assert_includes html, "→"
     end
 
     test "renders a disabled span when no next page" do
-      html = pagy_tailwind_nav(make_pagy(nxt: nil, series: [ "1" ]))
+      html = pagy_tailwind_nav(make_pagy(nxt: nil, page: 1, pages: 1))
       assert_includes html, "cursor-default"
       assert_includes html, "→"
     end
   end
 
-  # ── pagy.series ───────────────────────────────────────────────────────────
-  describe "series items" do
-    test "renders Integer pages as links" do
-      html = pagy_tailwind_nav(make_pagy(series: [ 1, "2", 3 ]))
+  # ── page numbers ──────────────────────────────────────────────────────────
+  describe "page numbers" do
+    test "renders every page from 1 to pages as a link" do
+      html = pagy_tailwind_nav(make_pagy(page: 2, pages: 3))
       assert_includes html, 'href="/?page=1"'
       assert_includes html, 'href="/?page=3"'
     end
 
-    test "renders String (current page) as highlighted span" do
-      html = pagy_tailwind_nav(make_pagy(series: [ 1, "2", 3 ]))
+    test "renders the current page as a highlighted span, not a link" do
+      html = pagy_tailwind_nav(make_pagy(page: 2, pages: 3))
       assert_includes html, "bg-stone-900"
       assert_includes html, ">2<"
-    end
-
-    test "renders :gap as ellipsis" do
-      html = pagy_tailwind_nav(make_pagy(series: [ 1, :gap, 5 ]))
-      assert_includes html, "…"
-    end
-
-    test "ignores unknown series item types" do
-      html = pagy_tailwind_nav(make_pagy(series: [ :unknown ]))
-      assert_not_includes html, "href"
+      assert_not_includes html, 'href="/?page=2"'
     end
   end
 end
