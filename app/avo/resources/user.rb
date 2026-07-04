@@ -7,6 +7,9 @@ class Avo::Resources::User < Avo::BaseResource
 
   def fields
     field :id, as: :id
-    field :email, as: :text
+    field :email, as: :text, required: true
+    field :password, as: :password, required: true, visible: true
+    field :password_confirmation, as: :password, required: true, visible: true
+    field :account, as: :belongs_to, required: true
   end
 end
