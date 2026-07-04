@@ -83,7 +83,7 @@ GEM
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
-    avo (3.32.1)
+    avo (4.0.7)
       actionview (>= 6.1)
       active_link_to
       activerecord (>= 6.1)
@@ -92,7 +92,7 @@ GEM
       avo-icons (>= 0.1.2)
       docile
       meta-tags
-      pagy (>= 7.0.0, < 43)
+      pagy (>= 43.0)
       prop_initializer (>= 0.3.0)
       turbo-rails (>= 2.0.0)
       turbo_power (>= 0.6.0)
@@ -230,7 +230,10 @@ GEM
       racc (~> 1.4)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
-    pagy (9.4.0)
+    pagy (43.5.6)
+      json
+      uri
+      yaml
     parallel (1.27.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
@@ -418,6 +421,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    yaml (0.4.0)
     zeitwerk (2.8.2)
 
 PLATFORMS
@@ -443,7 +447,7 @@ DEPENDENCIES
   jbuilder
   kamal
   lucide-rails
-  pagy (~> 9.0)
+  pagy (~> 43.5)
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)

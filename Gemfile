@@ -18,7 +18,7 @@ gem "avo"
 gem "acts_as_tenant"
 
 # --- Backend & Performance ---
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.5"
 gem "jbuilder"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "solid_cache"
