@@ -1,5 +1,4 @@
 module ApplicationHelper
-
   def pagy_tailwind_nav(pagy)
     html = +'<nav class="flex items-center gap-1">'
 
