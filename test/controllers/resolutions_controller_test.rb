@@ -75,6 +75,32 @@ class ResolutionsControllerTest < ActionDispatch::IntegrationTest
     assert ActsAsTenant.with_tenant(@account) { resolution.reload.needs_review? }
   end
 
+  test "POST create_product crea el producto y confirma la resolution" do
+    resolution = ActsAsTenant.with_tenant(@account) do
+      create(:resolution, account: @account, supplier_import: @supplier_import, status: :needs_review, raw_name: "Atun Lata 170g")
+    end
+
+    post create_product_supplier_import_resolution_path(@supplier_import, resolution),
+      params: { product: { name: "Atún en Lata 170g", cost_price: 1.6, sale_price: 2.2, stock: 0 } }
+
+    assert_redirected_to supplier_import_resolutions_path(@supplier_import)
+    assert ActsAsTenant.with_tenant(@account) { Product.exists?(name: "Atún en Lata 170g") }
+    assert ActsAsTenant.with_tenant(@account) { resolution.reload.confirmed? }
+  end
+
+  test "POST create_product sin nombre redirige con alert" do
+    resolution = ActsAsTenant.with_tenant(@account) do
+      create(:resolution, account: @account, supplier_import: @supplier_import, status: :needs_review)
+    end
+
+    post create_product_supplier_import_resolution_path(@supplier_import, resolution),
+      params: { product: { name: "", cost_price: 1.6, sale_price: 2.2, stock: 0 } }
+
+    assert_redirected_to supplier_import_resolutions_path(@supplier_import)
+    assert flash[:alert].present?
+    assert ActsAsTenant.with_tenant(@account) { resolution.reload.needs_review? }
+  end
+
   test "resolution de otro supplier_import retorna 404" do
     other_import = ActsAsTenant.with_tenant(@account) { create(:supplier_import, account: @account, supplier: @supplier) }
     resolution = ActsAsTenant.with_tenant(@account) do
