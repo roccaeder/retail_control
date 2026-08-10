@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_192906) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -20,6 +21,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
     t.string "subdomain", null: false
     t.datetime "updated_at", null: false
     t.index ["subdomain"], name: "index_accounts_on_subdomain", unique: true
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "customers", force: :cascade do |t|
@@ -72,6 +101,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "sku"], name: "index_products_on_account_id_and_sku", unique: true, where: "((sku IS NOT NULL) AND ((sku)::text <> ''::text))"
     t.index ["account_id"], name: "index_products_on_account_id"
+    t.index ["name"], name: "index_products_on_name_trigram", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "purchase_items", force: :cascade do |t|
@@ -98,6 +128,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_purchases_on_account_id"
     t.index ["supplier_id"], name: "index_purchases_on_supplier_id"
+  end
+
+  create_table "resolutions", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.jsonb "candidates", default: [], null: false
+    t.datetime "created_at", null: false
+    t.string "normalized_name", null: false
+    t.bigint "product_id"
+    t.string "raw_name", null: false
+    t.jsonb "raw_row", default: {}, null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.float "score"
+    t.integer "status", null: false
+    t.integer "strategy"
+    t.bigint "supplier_import_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_resolutions_on_account_id"
+    t.index ["product_id"], name: "index_resolutions_on_product_id"
+    t.index ["reviewed_by_id"], name: "index_resolutions_on_reviewed_by_id"
+    t.index ["supplier_import_id", "status"], name: "index_resolutions_on_supplier_import_id_and_status"
+    t.index ["supplier_import_id"], name: "index_resolutions_on_supplier_import_id"
   end
 
   create_table "sale_items", force: :cascade do |t|
@@ -269,6 +321,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
     t.index ["product_id"], name: "index_stock_movements_on_product_id"
   end
 
+  create_table "supplier_imports", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.integer "auto_matched_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.integer "needs_review_count", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "supplier_id", null: false
+    t.integer "total_rows", default: 0, null: false
+    t.integer "unmatched_count", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_supplier_imports_on_account_id_and_status"
+    t.index ["account_id"], name: "index_supplier_imports_on_account_id"
+    t.index ["supplier_id"], name: "index_supplier_imports_on_supplier_id"
+  end
+
   create_table "suppliers", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
@@ -294,6 +362,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "customers", "accounts"
   add_foreign_key "expenses", "accounts"
   add_foreign_key "expenses", "suppliers"
@@ -305,6 +375,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
   add_foreign_key "purchase_items", "purchases"
   add_foreign_key "purchases", "accounts"
   add_foreign_key "purchases", "suppliers"
+  add_foreign_key "resolutions", "accounts"
+  add_foreign_key "resolutions", "products"
+  add_foreign_key "resolutions", "supplier_imports"
+  add_foreign_key "resolutions", "users", column: "reviewed_by_id"
   add_foreign_key "sale_items", "accounts"
   add_foreign_key "sale_items", "products"
   add_foreign_key "sale_items", "sales"
@@ -318,6 +392,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_192503) do
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "stock_movements", "accounts"
   add_foreign_key "stock_movements", "products"
+  add_foreign_key "supplier_imports", "accounts"
+  add_foreign_key "supplier_imports", "suppliers"
   add_foreign_key "suppliers", "accounts"
   add_foreign_key "users", "accounts"
 end
