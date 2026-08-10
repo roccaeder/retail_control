@@ -4,7 +4,12 @@
 require "bcrypt"
 
 puts "Limpiando datos existentes..."
-[ Payment, SaleItem, Sale, Customer, Product, User, Account ].each(&:delete_all)
+SupplierImport.find_each(&:destroy) # purga el archivo adjunto y sus resolutions en cascada
+# Orden respetando las foreign keys (hijos antes que padres). StockMovement,
+# PurchaseItem, Purchase y Expense faltaban aquí desde que se agregaron sus
+# migraciones — sin ellos, un segundo `db:seed` fallaba por FK violation.
+[ Payment, SaleItem, StockMovement, PurchaseItem, Purchase, Expense, Sale, Customer, Product, Supplier, User, Account ]
+  .each(&:delete_all)
 
 NOMBRES_CLIENTES = [
   "Ana Martínez", "Luis García", "Tienda La Bendición", "Comercial Rodríguez",
@@ -30,7 +35,7 @@ PRODUCTOS_BASE = [
   { name: "Café Molido 250g",     costo: 2.80,  margen: 0.35 }
 ].freeze
 
-def seed_account(name:, subdomain:, email:, password:, clientes_count:, productos_count:, ventas_count:)
+def seed_account(name:, subdomain:, email:, password:, clientes_count:, productos_count:, ventas_count:, incluir_import_proveedor: false)
   puts "\n── Cuenta: #{name} ──"
 
   account = Account.create!(name: name, subdomain: subdomain)
@@ -71,6 +76,28 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
     end
     puts "  ✓ #{productos.size} productos"
 
+    # Proveedor con una lista de precios pendiente de revisión (demuestra el
+    # importador: nombres con mayúsculas/minúsculas mezcladas, unidades
+    # inconsistentes, tildes y guiones, y typos leves — como llegaría de
+    # verdad de un proveedor).
+    proveedor = Supplier.create!(
+      name:    "Distribuidora #{name.split.last}",
+      phone:   "9#{rand(10_000_000..99_999_999)}",
+      account: account
+    )
+    puts "  ✓ Proveedor: #{proveedor.name}"
+
+    if incluir_import_proveedor
+      supplier_import = SupplierImport.new(account: account, supplier: proveedor)
+      supplier_import.file.attach(
+        io:           Rails.root.join("test/fixtures/files/messy_supplier_products.csv").open,
+        filename:     "lista_precios_#{subdomain}.csv",
+        content_type: "text/csv"
+      )
+      supplier_import.save!
+      puts "  ✓ Import de proveedor pendiente: #{supplier_import.file.filename}"
+    end
+
     # Ventas históricas con lógica de deuda real
     ventas_count.times do |i|
       customer = clientes.sample
@@ -105,6 +132,7 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
 
       sale.subtotal = subtotal.round(2)
       sale.total    = [ subtotal - discount, 0 ].max.round(2)
+      sale.amount_received = [ sale.total, 0.01 ].max if on_credit # requerido por Sale#amount_received_valid_for_credit
       sale.save!
 
       if on_credit
@@ -144,7 +172,8 @@ seed_account(
   password:       "password123",
   clientes_count: 10,
   productos_count: 15,
-  ventas_count:   30
+  ventas_count:   30,
+  incluir_import_proveedor: true
 )
 
 # ── Cuenta 2: Segunda tienda (demuestra aislamiento multi-tenant) ─────────────
