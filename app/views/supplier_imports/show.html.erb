@@ -42,6 +42,12 @@
           <dd class="mt-1 text-xl font-bold text-amber-700"><%= @supplier_import.needs_review_count %></dd>
         </div>
       </dl>
+
+      <% if @supplier_import.needs_review_count > 0 %>
+        <%= link_to "Revisar coincidencias →", supplier_import_resolutions_path(@supplier_import),
+              class: "block text-center bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm",
+              data: { turbo_frame: "_top" } %>
+      <% end %>
     <% end %>
   </div>
 
