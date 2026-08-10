@@ -20,6 +20,7 @@ gem "acts_as_tenant"
 # --- Backend & Performance ---
 gem "pagy", "~> 43.5"
 gem "jbuilder"
+gem "csv" # no longer a default gem as of Ruby 3.4
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "solid_cache"
 gem "solid_queue"

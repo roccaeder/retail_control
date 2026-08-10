@@ -1,0 +1,448 @@
+---
+catalog:
+- name: Coca Cola 500ml
+- name: Coca Cola 1.5l
+- name: Inca Kola 500ml
+- name: Inca Kola 1.5l
+- name: Pepsi 500ml
+- name: Fanta Naranja 500ml
+- name: Sprite 500ml
+- name: Guarana 500ml
+- name: Cristal 620ml
+- name: Pilsen Callao 620ml
+- name: Cusqueña Dorada 620ml
+- name: Backus 355ml
+- name: Leche Gloria Entera 400g
+- name: Leche Gloria Evaporada 400g
+- name: Leche Ideal Evaporada 400g
+- name: Yogurt Gloria Fresa 1kg
+- name: Yogurt Laive Durazno 1kg
+- name: Mantequilla Gloria 200g
+- name: Queso Fresco Laive 500g
+- name: Arroz Costeño Extra 750g
+- name: Arroz Faraón Superior 750g
+- name: Azúcar Rubia Casa Grande 1kg
+- name: Aceite Primor 1l
+- name: Aceite Cocinero 1l
+- name: Fideos Don Vittorio 500g
+- name: Atún Florida 170g
+- name: Sal Marina Emsal 1kg
+- name: Menestra Frijol Canario 500g
+- name: Galletas Soda Field 300g
+- name: Galletas Casino Chocolate 300g
+- name: Papitas Lays Clásicas 150g
+- name: Chocolate Sublime 90g
+- name: Chocolate Triton 90g
+- name: Café Nescafé Clásico 170g
+- name: Milo Polvo 400g
+- name: Detergente Ariel 850g
+- name: Detergente Bolívar 900g
+- name: Lejía Sapolio 1l
+- name: Jabón Marsella 250g
+- name: Papel Higiénico Suave 4un
+- name: Servilletas Elite 100un
+- name: Shampoo Sedal Liso 400ml
+- name: Jabón de Tocador Dove 90g
+- name: Pasta Dental Colgate Triple Acción 90g
+- name: Desodorante Rexona 150ml
+cases:
+- input: COCA COLA 500ML
+  expected: Coca Cola 500ml
+- input: Coca Cola 500 ML
+  expected: Coca Cola 500ml
+- input: "  Coca-Cola 500ml  "
+  expected: Coca Cola 500ml
+- input: Ccoa Cola 500ml
+  expected: Coca Cola 500ml
+- input: COCA COLA 1.5L
+  expected: Coca Cola 1.5l
+- input: Coca Cola 1.5L
+  expected: Coca Cola 1.5l
+- input: "  Coca-Cola 1.5l  "
+  expected: Coca Cola 1.5l
+- input: Ccoa Cola 1.5l
+  expected: Coca Cola 1.5l
+- input: INCA KOLA 500ML
+  expected: Inca Kola 500ml
+- input: Inca Kola 500 ml.
+  expected: Inca Kola 500ml
+- input: "  Inca-Kola 500ml  "
+  expected: Inca Kola 500ml
+- input: Icna Kola 500ml
+  expected: Inca Kola 500ml
+- input: INCA KOLA 1.5L
+  expected: Inca Kola 1.5l
+- input: Inca Kola 1.5 L
+  expected: Inca Kola 1.5l
+- input: "  Inca-Kola 1.5l  "
+  expected: Inca Kola 1.5l
+- input: Icna Kola 1.5l
+  expected: Inca Kola 1.5l
+- input: PEPSI 500ML
+  expected: Pepsi 500ml
+- input: Pepsi 500ML
+  expected: Pepsi 500ml
+- input: "  Pepsi-500ml  "
+  expected: Pepsi 500ml
+- input: Ppesi 500ml
+  expected: Pepsi 500ml
+- input: FANTA NARANJA 500ML
+  expected: Fanta Naranja 500ml
+- input: Fanta Naranja 500 ml.
+  expected: Fanta Naranja 500ml
+- input: "  Fanta-Naranja 500ml  "
+  expected: Fanta Naranja 500ml
+- input: Fnata Naranja 500ml
+  expected: Fanta Naranja 500ml
+- input: SPRITE 500ML
+  expected: Sprite 500ml
+- input: Sprite 500 ML
+  expected: Sprite 500ml
+- input: "  Sprite-500ml  "
+  expected: Sprite 500ml
+- input: Srpite 500ml
+  expected: Sprite 500ml
+- input: GUARANA 500ML
+  expected: Guarana 500ml
+- input: Guarana 500ML
+  expected: Guarana 500ml
+- input: "  Guarana-500ml  "
+  expected: Guarana 500ml
+- input: Gaurana 500ml
+  expected: Guarana 500ml
+- input: CRISTAL 620ML
+  expected: Cristal 620ml
+- input: Cristal 620 ml.
+  expected: Cristal 620ml
+- input: "  Cristal-620ml  "
+  expected: Cristal 620ml
+- input: Cirstal 620ml
+  expected: Cristal 620ml
+- input: PILSEN CALLAO 620ML
+  expected: Pilsen Callao 620ml
+- input: Pilsen Callao 620 ML
+  expected: Pilsen Callao 620ml
+- input: "  Pilsen-Callao 620ml  "
+  expected: Pilsen Callao 620ml
+- input: Plisen Callao 620ml
+  expected: Pilsen Callao 620ml
+- input: CUSQUEÑA DORADA 620ML
+  expected: Cusqueña Dorada 620ml
+- input: Cusqueña Dorada 620ML
+  expected: Cusqueña Dorada 620ml
+- input: "  Cusquena-Dorada 620ml  "
+  expected: Cusqueña Dorada 620ml
+- input: Csuqueña Dorada 620ml
+  expected: Cusqueña Dorada 620ml
+- input: BACKUS 355ML
+  expected: Backus 355ml
+- input: Backus 355 ml.
+  expected: Backus 355ml
+- input: "  Backus-355ml  "
+  expected: Backus 355ml
+- input: Bcakus 355ml
+  expected: Backus 355ml
+- input: LECHE GLORIA ENTERA 400G
+  expected: Leche Gloria Entera 400g
+- input: Leche Gloria Entera 400 G
+  expected: Leche Gloria Entera 400g
+- input: "  Leche-Gloria Entera 400g  "
+  expected: Leche Gloria Entera 400g
+- input: Lcehe Gloria Entera 400g
+  expected: Leche Gloria Entera 400g
+- input: LECHE GLORIA EVAPORADA 400G
+  expected: Leche Gloria Evaporada 400g
+- input: Leche Gloria Evaporada 400G
+  expected: Leche Gloria Evaporada 400g
+- input: "  Leche-Gloria Evaporada 400g  "
+  expected: Leche Gloria Evaporada 400g
+- input: Lcehe Gloria Evaporada 400g
+  expected: Leche Gloria Evaporada 400g
+- input: LECHE IDEAL EVAPORADA 400G
+  expected: Leche Ideal Evaporada 400g
+- input: Leche Ideal Evaporada 400 g.
+  expected: Leche Ideal Evaporada 400g
+- input: "  Leche-Ideal Evaporada 400g  "
+  expected: Leche Ideal Evaporada 400g
+- input: Lcehe Ideal Evaporada 400g
+  expected: Leche Ideal Evaporada 400g
+- input: YOGURT GLORIA FRESA 1KG
+  expected: Yogurt Gloria Fresa 1kg
+- input: Yogurt Gloria Fresa 1 KG
+  expected: Yogurt Gloria Fresa 1kg
+- input: "  Yogurt-Gloria Fresa 1kg  "
+  expected: Yogurt Gloria Fresa 1kg
+- input: Ygourt Gloria Fresa 1kg
+  expected: Yogurt Gloria Fresa 1kg
+- input: YOGURT LAIVE DURAZNO 1KG
+  expected: Yogurt Laive Durazno 1kg
+- input: Yogurt Laive Durazno 1KG
+  expected: Yogurt Laive Durazno 1kg
+- input: "  Yogurt-Laive Durazno 1kg  "
+  expected: Yogurt Laive Durazno 1kg
+- input: Ygourt Laive Durazno 1kg
+  expected: Yogurt Laive Durazno 1kg
+- input: MANTEQUILLA GLORIA 200G
+  expected: Mantequilla Gloria 200g
+- input: Mantequilla Gloria 200 g.
+  expected: Mantequilla Gloria 200g
+- input: "  Mantequilla-Gloria 200g  "
+  expected: Mantequilla Gloria 200g
+- input: Mnatequilla Gloria 200g
+  expected: Mantequilla Gloria 200g
+- input: QUESO FRESCO LAIVE 500G
+  expected: Queso Fresco Laive 500g
+- input: Queso Fresco Laive 500 G
+  expected: Queso Fresco Laive 500g
+- input: "  Queso-Fresco Laive 500g  "
+  expected: Queso Fresco Laive 500g
+- input: Qeuso Fresco Laive 500g
+  expected: Queso Fresco Laive 500g
+- input: ARROZ COSTEÑO EXTRA 750G
+  expected: Arroz Costeño Extra 750g
+- input: Arroz Costeño Extra 750G
+  expected: Arroz Costeño Extra 750g
+- input: "  Arroz-Costeno Extra 750g  "
+  expected: Arroz Costeño Extra 750g
+- input: Arroz Costeño Extra 750g
+  expected: Arroz Costeño Extra 750g
+- input: ARROZ FARAÓN SUPERIOR 750G
+  expected: Arroz Faraón Superior 750g
+- input: Arroz Faraón Superior 750 g.
+  expected: Arroz Faraón Superior 750g
+- input: "  Arroz-Faraon Superior 750g  "
+  expected: Arroz Faraón Superior 750g
+- input: Arroz Faraón Superior 750g
+  expected: Arroz Faraón Superior 750g
+- input: AZÚCAR RUBIA CASA GRANDE 1KG
+  expected: Azúcar Rubia Casa Grande 1kg
+- input: Azúcar Rubia Casa Grande 1 KG
+  expected: Azúcar Rubia Casa Grande 1kg
+- input: "  Azucar-Rubia Casa Grande 1kg  "
+  expected: Azúcar Rubia Casa Grande 1kg
+- input: Aúzcar Rubia Casa Grande 1kg
+  expected: Azúcar Rubia Casa Grande 1kg
+- input: ACEITE PRIMOR 1L
+  expected: Aceite Primor 1l
+- input: Aceite Primor 1L
+  expected: Aceite Primor 1l
+- input: "  Aceite-Primor 1l  "
+  expected: Aceite Primor 1l
+- input: Aecite Primor 1l
+  expected: Aceite Primor 1l
+- input: ACEITE COCINERO 1L
+  expected: Aceite Cocinero 1l
+- input: Aceite Cocinero 1 l.
+  expected: Aceite Cocinero 1l
+- input: "  Aceite-Cocinero 1l  "
+  expected: Aceite Cocinero 1l
+- input: Aecite Cocinero 1l
+  expected: Aceite Cocinero 1l
+- input: FIDEOS DON VITTORIO 500G
+  expected: Fideos Don Vittorio 500g
+- input: Fideos Don Vittorio 500 G
+  expected: Fideos Don Vittorio 500g
+- input: "  Fideos-Don Vittorio 500g  "
+  expected: Fideos Don Vittorio 500g
+- input: Fdieos Don Vittorio 500g
+  expected: Fideos Don Vittorio 500g
+- input: ATÚN FLORIDA 170G
+  expected: Atún Florida 170g
+- input: Atún Florida 170G
+  expected: Atún Florida 170g
+- input: "  Atun-Florida 170g  "
+  expected: Atún Florida 170g
+- input: Aútn Florida 170g
+  expected: Atún Florida 170g
+- input: SAL MARINA EMSAL 1KG
+  expected: Sal Marina Emsal 1kg
+- input: Sal Marina Emsal 1 kg.
+  expected: Sal Marina Emsal 1kg
+- input: "  Sal-Marina Emsal 1kg  "
+  expected: Sal Marina Emsal 1kg
+- input: Sal Mraina Emsal 1kg
+  expected: Sal Marina Emsal 1kg
+- input: MENESTRA FRIJOL CANARIO 500G
+  expected: Menestra Frijol Canario 500g
+- input: Menestra Frijol Canario 500 G
+  expected: Menestra Frijol Canario 500g
+- input: "  Menestra-Frijol Canario 500g  "
+  expected: Menestra Frijol Canario 500g
+- input: Mneestra Frijol Canario 500g
+  expected: Menestra Frijol Canario 500g
+- input: GALLETAS SODA FIELD 300G
+  expected: Galletas Soda Field 300g
+- input: Galletas Soda Field 300G
+  expected: Galletas Soda Field 300g
+- input: "  Galletas-Soda Field 300g  "
+  expected: Galletas Soda Field 300g
+- input: Glaletas Soda Field 300g
+  expected: Galletas Soda Field 300g
+- input: GALLETAS CASINO CHOCOLATE 300G
+  expected: Galletas Casino Chocolate 300g
+- input: Galletas Casino Chocolate 300 g.
+  expected: Galletas Casino Chocolate 300g
+- input: "  Galletas-Casino Chocolate 300g  "
+  expected: Galletas Casino Chocolate 300g
+- input: Glaletas Casino Chocolate 300g
+  expected: Galletas Casino Chocolate 300g
+- input: PAPITAS LAYS CLÁSICAS 150G
+  expected: Papitas Lays Clásicas 150g
+- input: Papitas Lays Clásicas 150 G
+  expected: Papitas Lays Clásicas 150g
+- input: "  Papitas-Lays Clasicas 150g  "
+  expected: Papitas Lays Clásicas 150g
+- input: Ppaitas Lays Clásicas 150g
+  expected: Papitas Lays Clásicas 150g
+- input: CHOCOLATE SUBLIME 90G
+  expected: Chocolate Sublime 90g
+- input: Chocolate Sublime 90G
+  expected: Chocolate Sublime 90g
+- input: "  Chocolate-Sublime 90g  "
+  expected: Chocolate Sublime 90g
+- input: Cohcolate Sublime 90g
+  expected: Chocolate Sublime 90g
+- input: CHOCOLATE TRITON 90G
+  expected: Chocolate Triton 90g
+- input: Chocolate Triton 90 g.
+  expected: Chocolate Triton 90g
+- input: "  Chocolate-Triton 90g  "
+  expected: Chocolate Triton 90g
+- input: Cohcolate Triton 90g
+  expected: Chocolate Triton 90g
+- input: CAFÉ NESCAFÉ CLÁSICO 170G
+  expected: Café Nescafé Clásico 170g
+- input: Café Nescafé Clásico 170 G
+  expected: Café Nescafé Clásico 170g
+- input: "  Cafe-Nescafe Clasico 170g  "
+  expected: Café Nescafé Clásico 170g
+- input: Cfaé Nescafé Clásico 170g
+  expected: Café Nescafé Clásico 170g
+- input: MILO POLVO 400G
+  expected: Milo Polvo 400g
+- input: Milo Polvo 400G
+  expected: Milo Polvo 400g
+- input: "  Milo-Polvo 400g  "
+  expected: Milo Polvo 400g
+- input: Mlio Polvo 400g
+  expected: Milo Polvo 400g
+- input: DETERGENTE ARIEL 850G
+  expected: Detergente Ariel 850g
+- input: Detergente Ariel 850 g.
+  expected: Detergente Ariel 850g
+- input: "  Detergente-Ariel 850g  "
+  expected: Detergente Ariel 850g
+- input: Dteergente Ariel 850g
+  expected: Detergente Ariel 850g
+- input: DETERGENTE BOLÍVAR 900G
+  expected: Detergente Bolívar 900g
+- input: Detergente Bolívar 900 G
+  expected: Detergente Bolívar 900g
+- input: "  Detergente-Bolivar 900g  "
+  expected: Detergente Bolívar 900g
+- input: Dteergente Bolívar 900g
+  expected: Detergente Bolívar 900g
+- input: LEJÍA SAPOLIO 1L
+  expected: Lejía Sapolio 1l
+- input: Lejía Sapolio 1L
+  expected: Lejía Sapolio 1l
+- input: "  Lejia-Sapolio 1l  "
+  expected: Lejía Sapolio 1l
+- input: Ljeía Sapolio 1l
+  expected: Lejía Sapolio 1l
+- input: JABÓN MARSELLA 250G
+  expected: Jabón Marsella 250g
+- input: Jabón Marsella 250 g.
+  expected: Jabón Marsella 250g
+- input: "  Jabon-Marsella 250g  "
+  expected: Jabón Marsella 250g
+- input: Jbaón Marsella 250g
+  expected: Jabón Marsella 250g
+- input: PAPEL HIGIÉNICO SUAVE 4UN
+  expected: Papel Higiénico Suave 4un
+- input: Papel Higiénico Suave 4 UN
+  expected: Papel Higiénico Suave 4un
+- input: "  Papel-Higienico Suave 4un  "
+  expected: Papel Higiénico Suave 4un
+- input: Ppael Higiénico Suave 4un
+  expected: Papel Higiénico Suave 4un
+- input: SERVILLETAS ELITE 100UN
+  expected: Servilletas Elite 100un
+- input: Servilletas Elite 100UN
+  expected: Servilletas Elite 100un
+- input: "  Servilletas-Elite 100un  "
+  expected: Servilletas Elite 100un
+- input: Srevilletas Elite 100un
+  expected: Servilletas Elite 100un
+- input: SHAMPOO SEDAL LISO 400ML
+  expected: Shampoo Sedal Liso 400ml
+- input: Shampoo Sedal Liso 400 ml.
+  expected: Shampoo Sedal Liso 400ml
+- input: "  Shampoo-Sedal Liso 400ml  "
+  expected: Shampoo Sedal Liso 400ml
+- input: Sahmpoo Sedal Liso 400ml
+  expected: Shampoo Sedal Liso 400ml
+- input: JABÓN DE TOCADOR DOVE 90G
+  expected: Jabón de Tocador Dove 90g
+- input: Jabón de Tocador Dove 90 G
+  expected: Jabón de Tocador Dove 90g
+- input: "  Jabon-de Tocador Dove 90g  "
+  expected: Jabón de Tocador Dove 90g
+- input: Jbaón de Tocador Dove 90g
+  expected: Jabón de Tocador Dove 90g
+- input: PASTA DENTAL COLGATE TRIPLE ACCIÓN 90G
+  expected: Pasta Dental Colgate Triple Acción 90g
+- input: Pasta Dental Colgate Triple Acción 90G
+  expected: Pasta Dental Colgate Triple Acción 90g
+- input: "  Pasta-Dental Colgate Triple Accion 90g  "
+  expected: Pasta Dental Colgate Triple Acción 90g
+- input: Psata Dental Colgate Triple Acción 90g
+  expected: Pasta Dental Colgate Triple Acción 90g
+- input: DESODORANTE REXONA 150ML
+  expected: Desodorante Rexona 150ml
+- input: Desodorante Rexona 150 ml.
+  expected: Desodorante Rexona 150ml
+- input: "  Desodorante-Rexona 150ml  "
+  expected: Desodorante Rexona 150ml
+- input: Dseodorante Rexona 150ml
+  expected: Desodorante Rexona 150ml
+- input: Papel Aluminio Reynolds 30m
+  expected:
+- input: Insecticida Baygon 360ml
+  expected:
+- input: Pilas Duracell AA x4
+  expected:
+- input: Escoba de Paja
+  expected:
+- input: Tenedores Descartables x50
+  expected:
+- input: Vela Blanca Grande
+  expected:
+- input: Fósforos Llama x10
+  expected:
+- input: Bolsas Basura Negra x20
+  expected:
+- input: Cinta Adhesiva Scotch
+  expected:
+- input: Pañales Huggies Talla M
+  expected:
+- input: Cuaderno Loro 100 Hojas
+  expected:
+- input: Lapicero Faber Castell Azul
+  expected:
+- input: Agua San Luis 625ml
+  expected:
+- input: Mayonesa Alacena 200g
+  expected:
+- input: Kétchup Alacena 400g
+  expected:
+- input: Mostaza Alacena 200g
+  expected:
+- input: Vinagre Blanco 500ml
+  expected:
+- input: asdkjaslkdj alskdjaslkdj
+  expected:
+- input: N/A
+  expected:
+- input: producto sin nombre definido todavia
+  expected:

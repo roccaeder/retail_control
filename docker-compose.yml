@@ -18,8 +18,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_PASSWORD: password 
+      DB_PASSWORD: password
       RAILS_ENV: development
+      SOLID_QUEUE_IN_PUMA: "true"
     depends_on:
       - db
     stdin_open: true  # Corresponde a -i

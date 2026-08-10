@@ -18,6 +18,9 @@ Rails.application.routes.draw do
   resources :purchases do
     member { patch :receive }
   end
+  resources :supplier_imports, only: [ :index, :new, :create, :show ] do
+    resources :resolutions, only: [ :index, :update ]
+  end
 
   resources :expenses, only: [ :index, :new, :create, :destroy ]
 

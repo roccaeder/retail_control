@@ -50,7 +50,10 @@ Rails.application.configure do
   # config.cache_store = :mem_cache_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
-  # config.active_job.queue_adapter = :resque
+  # Single-database Solid Queue: this app runs one Postgres database per
+  # environment, so job tables live alongside the rest of the schema
+  # instead of a separate `queue` connection.
+  config.active_job.queue_adapter = :solid_queue
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
