@@ -98,7 +98,13 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
       puts "  ✓ Import de proveedor pendiente: #{supplier_import.file.filename}"
     end
 
-    # Ventas históricas con lógica de deuda real
+    # Ventas históricas con lógica de deuda real.
+    # stock_disponible rastrea en memoria lo que le queda a cada producto
+    # para no vender más de lo que hay (los pedidos se sirven contra stock
+    # real vía Sale#update_product_stock, que lanza RecordInvalid si no
+    # alcanza).
+    stock_disponible = productos.index_by(&:id).transform_values(&:stock)
+
     ventas_count.times do |i|
       customer = clientes.sample
       on_credit = [ true, false, false ].sample   # ~33% fiado
@@ -118,8 +124,13 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
 
       subtotal = 0
       rand(1..4).times do
-        product = productos.sample
-        cantidad = rand(1..3)
+        productos_con_stock = productos.select { |p| stock_disponible[p.id] > 0 }
+        next if productos_con_stock.empty?
+
+        product = productos_con_stock.sample
+        cantidad = [ rand(1..3), stock_disponible[product.id] ].min
+        stock_disponible[product.id] -= cantidad
+
         subtotal += product.sale_price * cantidad
         sale.sale_items << SaleItem.new(
           product:    product,
@@ -129,6 +140,7 @@ def seed_account(name:, subdomain:, email:, password:, clientes_count:, producto
           account:    account
         )
       end
+      next if sale.sale_items.empty?
 
       sale.subtotal = subtotal.round(2)
       sale.total    = [ subtotal - discount, 0 ].max.round(2)
