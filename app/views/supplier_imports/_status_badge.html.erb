@@ -1,0 +1,10 @@
+<% badge = {
+  "pending"    => { label: "Pendiente",  bg: "bg-stone-100",   text: "text-stone-600",   dot: "bg-stone-400" },
+  "processing" => { label: "Procesando", bg: "bg-amber-50",    text: "text-amber-700",   dot: "bg-amber-500" },
+  "completed"  => { label: "Completado", bg: "bg-emerald-50",  text: "text-emerald-700", dot: "bg-emerald-500" },
+  "failed"     => { label: "Fallido",    bg: "bg-rose-50",     text: "text-rose-700",    dot: "bg-rose-500" }
+}.fetch(supplier_import.status) %>
+
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold <%= badge[:bg] %> <%= badge[:text] %>">
+  <span class="w-1.5 h-1.5 rounded-full <%= badge[:dot] %>"></span> <%= badge[:label] %>
+</span>
