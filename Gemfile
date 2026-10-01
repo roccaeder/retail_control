@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 8.1.0"
+gem "rails", "~> 8.1.4"
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 
@@ -18,7 +18,7 @@ gem "avo"
 gem "acts_as_tenant"
 
 # --- Backend & Performance ---
-gem "pagy", "~> 43.5"
+gem "pagy", "~> 43.6"
 gem "jbuilder"
 gem "csv" # no longer a default gem as of Ruby 3.4
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -26,7 +26,7 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 gem "bootsnap", require: false
-gem "image_processing", "~> 2.0"
+gem "image_processing", "~> 2.1"
 
 # --- Deployment ---
 gem "kamal", require: false
